@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.*;
 
 @RestController
-@RequestMapping("/pk/")
+@RequestMapping("/home/")
 public class BotInfoController {
 
     @RequestMapping("getbotinfo/")
