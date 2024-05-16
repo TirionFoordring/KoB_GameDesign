@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import { Game_Map } from '@/assets/script/GameMap'
+import { Game_Map } from '@/assets/script/GameMap.js'
 import { ref, onMounted } from "vue" //onMounted表示挂载完后需要执行的操作
 export default {
     setup() {
@@ -28,5 +28,8 @@ export default {
 div.GameMap{
     width: 100%;
     height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 </style>
