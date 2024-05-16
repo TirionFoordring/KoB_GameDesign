@@ -1,15 +1,15 @@
 <template>
-    <ContentField>
-        Home Page
-    </ContentField>
+    <playground>
+        
+    </playground>
 </template>
 
 <script>
-import ContentField from "../../components/ContentField.vue"
+import playground from "../../components/PlayGround.vue"
 
 export default {
     components:{
-        ContentField
+        playground
     }
 }
 
