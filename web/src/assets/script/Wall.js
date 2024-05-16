@@ -17,6 +17,6 @@ export class Wall extends Base_Object {
         const L = this.gamemap.L;
         const ctx = this.gamemap.ctx;
         ctx.fillStyle = this.color;
-        ctx.fillRect(this.c * L, this.r * L, L + 1, L + 1);
+        ctx.fillRect(this.c * L, this.r * L, L, L);
     }
 }
