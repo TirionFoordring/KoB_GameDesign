@@ -10,15 +10,24 @@ export class Game_Map extends Base_Object {
         this.rows = 13;
         this.cols = 13;
         this.walls = [];
-        this.inner_walls_number = 24;
+        this.inner_walls_number = 23;
     }
 
     //Ensure that the bottom left and top right corners of the map are connected
     //source:(sx, sy); target:(tx, ty)
     connectivity(g, sx, sy, tx, ty) {
+        // if source == target, that means this function is over;
         if (sx === tx && sy === ty) return true;
 
-        return true;
+        g[sx][sy] = true;
+        let dx = [-1, 0, 1, 0], dy = [0, 1, 0, -1];
+        for (let i = 0; i < 4; i++) {
+            let x = sx + dx[i], y = sy + dy[i];
+            if (!g[x][y] && this.connectivity(g, x, y, tx, ty))
+                return true
+        }
+
+        return false;
     }
 
     Creat_Wall() {
@@ -46,7 +55,7 @@ export class Game_Map extends Base_Object {
                 let c = parseInt(Math.random(0, 1) * this.cols);
 
                 //如果此处已经是墙壁了，再次搜索
-                if (g[r][c])
+                if (g[r][c] || g[this.rows - 1 - r][this.cols - 1 - c])
                     continue;
 
                 //左下角和右上角禁止生成墙壁
@@ -55,7 +64,7 @@ export class Game_Map extends Base_Object {
 
                 //add the wall symmetrically
                 g[r][c] = true;
-                g[c][r] = true;
+                g[this.rows - 1 - r][this.cols - 1 - c] = true;
                 break;
 
             }

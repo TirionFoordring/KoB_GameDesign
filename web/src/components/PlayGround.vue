@@ -21,6 +21,6 @@ div.playground{
     width: 60vw;  /*60vw代表屏幕宽度的60%*/
     height: 70vh; /*70vh代表屏幕高度的70%*/
     margin: 25px auto 0px;
-    background-color: aqua;
+    /* background-color: aqua; */
 }
 </style>
