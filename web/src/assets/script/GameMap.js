@@ -1,4 +1,5 @@
 import { Base_Object } from "./BaseObject.js";
+import { snake } from "./Snake.js";
 import { Wall } from "./Wall.js";
 
 export class Game_Map extends Base_Object {
@@ -10,7 +11,12 @@ export class Game_Map extends Base_Object {
         this.rows = 13;
         this.cols = 13;
         this.walls = [];
-        this.inner_walls_number = 23;
+        this.inner_walls_number = 20;
+
+        this.snakes = [
+            new snake({ id: 0, color: "#4876EC", r: this.rows - 2, c: 1 }, this),
+            new snake({ id: 1, color: "#F94848", r: 1, c: this.cols - 2 }, this)
+        ]
     }
 
     //Ensure that the bottom left and top right corners of the map are connected
@@ -30,7 +36,7 @@ export class Game_Map extends Base_Object {
         return false;
     }
 
-    Creat_Wall() {
+    Create_Wall() {
         let g = [];
         for (let r = 0; r < this.rows; r++) {
             g[r] = [];
@@ -51,8 +57,8 @@ export class Game_Map extends Base_Object {
         //create inner walls randomly
         for (let i = 0; i < this.inner_walls_number / 2; i++) {
             for (let j = 0; j < 1000; j++) {
-                let r = parseInt(Math.random(0, 1) * this.rows);
-                let c = parseInt(Math.random(0, 1) * this.cols);
+                let r = parseInt(Math.random() * this.rows);
+                let c = parseInt(Math.random() * this.cols);
 
                 //如果此处已经是墙壁了，再次搜索
                 if (g[r][c] || g[this.rows - 1 - r][this.cols - 1 - c])
@@ -91,11 +97,29 @@ export class Game_Map extends Base_Object {
         return true;
     }
 
-    start() {
-        while (!this.Creat_Wall()) {
-            this.Creat_Wall();
-        }
+    //获取用户输入
+    add_listening_events() {
+        this.ctx.canvas.focus();
 
+        const [snake0, snake1] = this.snakes;
+        this.ctx.canvas.addEventListener("keydown", e => {
+            if (e.key === "w") snake0.set_direction(0);
+            else if (e.key === "d") snake0.set_direction(1);
+            else if (e.key === "s") snake0.set_direction(2);
+            else if (e.key === "a") snake0.set_direction(3);
+            else if (e.key === "ArrowUp") snake1.set_direction(0);
+            else if (e.key === "ArrowRight") snake1.set_direction(1);
+            else if (e.key === "ArrowDown") snake1.set_direction(2);
+            else if (e.key === "ArrowLeft") snake1.set_direction(3);
+
+        })
+    }
+
+    start() {
+        while (!this.Create_Wall()) {
+            this.Create_Wall();
+        }
+        this.add_listening_events();
     }
 
     update_size() {
@@ -106,8 +130,26 @@ export class Game_Map extends Base_Object {
         this.ctx.canvas.height = this.L * this.rows;
     }
 
+    //check are the two snakes are ready.
+    check_ready() {
+        for (const snake of this.snakes) {
+            if (snake.status !== "idle") return false;
+            if (snake.direction === -1) return false;
+        }
+        return true;
+    }
+
+    next_step() {
+        for (const snake of this.snakes) {
+            snake.next_step();
+        }
+    }
+
     update() {
         this.update_size();
+        if (this.check_ready()) {
+            this.next_step();
+        }
         this.render();
     }
 
