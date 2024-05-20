@@ -46,7 +46,7 @@ export class snake extends Base_Object {
     update_move() {
         const dx = this.next_cell.x - this.cells[0].x;
         const dy = this.next_cell.y - this.cells[0].y;
-        const distance = Math.sqrt(dx * dx, dy * dy);
+        const distance = Math.sqrt(dx * dx + dy * dy); // 2024-05-20, 更改了此处的错误，将"+"写错成","导致蛇左右移动时有平滑移动的动画，上下移动的时候却没有动画
 
         if (distance < this.eps) {
             this.cells[0] = this.next_cell; //将新的点添加为蛇头

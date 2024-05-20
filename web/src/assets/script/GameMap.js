@@ -9,7 +9,7 @@ export class Game_Map extends Base_Object {
         this.parent = parent;
         this.L = 0; //L为单位长度
         this.rows = 13;
-        this.cols = 13;
+        this.cols = 14;
         this.walls = [];
         this.inner_walls_number = 20;
 
@@ -37,7 +37,7 @@ export class Game_Map extends Base_Object {
     }
 
     Create_Wall() {
-        let g = [];
+        const g = [];
         for (let r = 0; r < this.rows; r++) {
             g[r] = [];
             for (let c = 0; c < this.cols; c++) {
@@ -47,9 +47,17 @@ export class Game_Map extends Base_Object {
 
         //add walls around the map
         for (let r = 0; r < this.rows; r++) {
+            g[r][0] = g[r][this.cols - 1] = true;
+        }
+
+        for (let c = 0; c < this.cols; c++) {
+            g[0][c] = g[this.rows - 1][c] = true;
+        }
+
+        for (let r = 0; r < this.rows; r++) {
             for (let c = 0; c < this.cols; c++) {
-                if (r === 0 || c === 0 || r === this.rows - 1 || c === this.cols - 1) {
-                    g[r][c] = true;
+                if (g[r][c]) {
+                    this.walls.push(new Wall(r, c, this));
                 }
             }
         }
@@ -61,12 +69,10 @@ export class Game_Map extends Base_Object {
                 let c = parseInt(Math.random() * this.cols);
 
                 //如果此处已经是墙壁了，再次搜索
-                if (g[r][c] || g[this.rows - 1 - r][this.cols - 1 - c])
-                    continue;
+                if (g[r][c] || g[this.rows - 1 - r][this.cols - 1 - c]) continue;
 
                 //左下角和右上角禁止生成墙壁
-                if ((r === this.rows - 2 && c === 1) || (r === 1 && c === this.cols - 2))
-                    continue;
+                if ((r === this.rows - 2 && c === 1) || (r === 1 && c === this.cols - 2)) continue;
 
                 //add the wall symmetrically
                 g[r][c] = true;
@@ -80,10 +86,8 @@ export class Game_Map extends Base_Object {
         //把g转换为JSON文件再解析，确保复制的同时不会影响原本的文件
         const copy_g = JSON.parse(JSON.stringify(g));
 
-
         //check whether the the bottom left and top right corners of the map are connected
-        if (!this.connectivity(copy_g, 1, this.rows - 2, this.cols - 2, 1)) return false;
-
+        if (!this.connectivity(copy_g, this.rows - 2, 1, 1, this.cols - 2)) return false; //2024-05-20更改，参数传入错误导致地图的长和宽一旦变得不同就无法生成地图
 
         //draw all walls
         for (let r = 0; r < this.rows; r++) {
@@ -111,14 +115,15 @@ export class Game_Map extends Base_Object {
             else if (e.key === "ArrowRight") snake1.set_direction(1);
             else if (e.key === "ArrowDown") snake1.set_direction(2);
             else if (e.key === "ArrowLeft") snake1.set_direction(3);
-
         })
     }
 
     start() {
-        while (!this.Create_Wall()) {
-            this.Create_Wall();
+        for (let i = 0; i < 1000; i++) {
+            if (this.Create_Wall())
+                break;
         }
+
         this.add_listening_events();
     }
 
