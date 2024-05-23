@@ -142,6 +142,7 @@ export class snake extends Base_Object {
             }
         }
 
+        //draw the eyes
         ctx.fillStyle = "black";
         for (let i = 0; i < 2; i++) {
             const eye_x = (this.cells[0].x + this.eye_dx[this.eye_direction][i] * 0.13) * L;

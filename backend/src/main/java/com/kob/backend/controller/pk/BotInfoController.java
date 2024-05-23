@@ -6,10 +6,9 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.*;
 
 @RestController
-@RequestMapping("/home/")
 public class BotInfoController {
 
-    @RequestMapping("getbotinfo/")
+    @RequestMapping("/pk/getbotinfo/")
     public Map<String,String> getBotInfo(){
 
         Map<String,String> bot1 = new HashMap<>();
