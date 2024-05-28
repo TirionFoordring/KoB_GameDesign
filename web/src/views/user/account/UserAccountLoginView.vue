@@ -5,18 +5,18 @@
                 <form @submit.prevent="login">
                     <div class="mb-3">
                         <label for="username" class="form-label">Username</label>
-                        <input v-model="username" type="text" class="form-control" id="username" placeholder="Please enter your username">
+                        <input v-model="username" type="text" class="form-control" id="username" placeholder="Please enter your username.">
                     </div>
                     <div class="mb-3">
                         <label for="password" class="form-label">Password</label>
-                        <input v-model="password" type="password" class="form-control" id="password" placeholder="Please enter your password">
+                        <input v-model="password" type="password" class="form-control" id="password" placeholder="Please enter your password.">
                     </div>
                     <div class="mb-3 form-check">
                         <input type="checkbox" class="form-check-input" id="exampleCheck1">
                         <label class="form-check-label" for="exampleCheck1">Check me out</label>
                     </div>
                     <div id="error_message">{{ error_message }}</div>
-                    <button id="submit" class="btn btn-primary">Submit</button>
+                    <button type="submit" class="btn btn-primary" id="submit">Submit</button>
                 </form>
             </div>
         </div>
@@ -49,7 +49,6 @@ export default {
                     store.dispatch("getinfo", {
                         success(){
                             router.push({ name: "home"});
-                            console.log(store.state.user);
                         }
                     }); 
                     router.push({ name: "home"});

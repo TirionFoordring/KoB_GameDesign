@@ -13,24 +13,24 @@ export default {
   components:{
     NavBar
   },
-  setup() {
+  // setup() {
 
-    // $.ajax({
-    //   url: "http://localhost:3000/user/account/register/",
-    //   type: "post",
-    //   data: {
-    //     username: "jinshaobo",
-    //     password: "123456",
-    //     confirmedPassword: "123456",
-    //   },
-    //   success(resp){
-    //     console.log(resp);
-    //   },
-    //   error(resp){
-    //     console.log(resp);
-    //   }
-    // })
-  }
+  //   $.ajax({
+  //     url: "http://localhost:3000/user/account/register/",
+  //     type: "post",
+  //     data: {
+  //       username: "",
+  //       password: "",
+  //       confirmedPassword: "",
+  //     },
+  //     success(resp){
+  //       console.log(resp);
+  //     },
+  //     error(resp){
+  //       console.log(resp);
+  //     }
+  //   })
+  // }
 }
 
 </script>
