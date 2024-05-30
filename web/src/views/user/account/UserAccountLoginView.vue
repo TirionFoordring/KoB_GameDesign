@@ -1,5 +1,5 @@
 <template>
-    <ContentField v-if="show_content">
+    <ContentField v-if="!$store.state.user.pulling_info">
         <div class="row justify-content-md-center">
             <div class="col-3">
                 <form @submit.prevent="login">
@@ -38,7 +38,6 @@ export default {
         let username = ref("");
         let password = ref("");
         let error_message = ref("");
-        let show_content = ref(false); //开始时登录页面不显示，确认需要登录后再显示，防止每次刷新时屏幕都会闪烁
 
         //为了保证刷新后不退出更新，将token存在浏览器的localStorage里，每次登陆之前先查看本地是否已有token
         const jwt_token = localStorage.getItem("jwt_token");
@@ -47,13 +46,14 @@ export default {
             store.dispatch("getinfo",{
                 success() {
                     router.push({name: "home"});
+                    store.commit("updatePullingInfo", false); //向mutations中的函数传数据用commit，向actions中的函数传数据用dispatch
                 },
                 error() {
-                    show_content.value = true;
-                },
+                    store.commit("updatePullingInfo", false);
+                }
             })
         } else {
-            show_content.value = true;
+            store.commit("updatePullingInfo", false);
         }
 
         const login = () => {
@@ -81,7 +81,6 @@ export default {
             password,
             error_message,
             login,
-            show_content,
         }
 
     }
