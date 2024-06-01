@@ -23,7 +23,7 @@ public class AddServiceImpl implements AddService {
     @Override
     public Map<String, String> add(Map<String, String> data) {
 
-        //获取用户信息的固定写法
+        //获取当前用户信息的固定写法
         UsernamePasswordAuthenticationToken authenticationToken = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         UserDetailsImpl loginUser = (UserDetailsImpl) authenticationToken.getPrincipal();
         User user = loginUser.getUser();
