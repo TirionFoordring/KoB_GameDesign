@@ -14,9 +14,12 @@ import java.util.Map;
 public class InfoServiceImpl implements InfoService {
     @Override
     public Map<String, String> getInfo() {
+
+        //获取用户信息的固定写法
         UsernamePasswordAuthenticationToken authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         UserDetailsImpl loginUser = (UserDetailsImpl) authentication.getPrincipal();
         User user = loginUser.getUser();
+
         Map<String, String> map = new HashMap<>();
         map.put("error_message", "success");
         map.put("id", user.getId().toString());
