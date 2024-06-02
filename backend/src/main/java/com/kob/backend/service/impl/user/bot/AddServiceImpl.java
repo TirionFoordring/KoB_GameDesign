@@ -54,12 +54,12 @@ public class AddServiceImpl implements AddService {
         }
 
         if (content == null || content.isEmpty()) {
-            map.put("error_message", "The content cannot be empty");
+            map.put("error_message", "The code cannot be empty");
             return map;
         }
 
         if (content.length() > 10000) {
-            map.put("error_message", "The content cannot be longer than 10000 characters");
+            map.put("error_message", "The code cannot be longer than 10000 characters");
             return map;
         }
 

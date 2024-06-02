@@ -22,8 +22,8 @@ public class Bot {
     private Integer rating;
 
     //定义日期表示的格式
-    @JsonFormat(pattern = "YYYY-MM-DD HH:MM:SS")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Tokyo")
     private Date createtime;
-    @JsonFormat(pattern = "YYYY-MM-DD HH:MM:SS")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Tokyo")
     private Date modifytime;
 }
