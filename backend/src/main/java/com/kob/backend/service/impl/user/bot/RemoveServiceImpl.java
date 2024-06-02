@@ -12,10 +12,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 @Service
 public class RemoveServiceImpl implements RemoveService {
+
     @Autowired
     private BotMapper botMapper;
 
@@ -42,7 +42,7 @@ public class RemoveServiceImpl implements RemoveService {
         }
 
         botMapper.deleteById(bot_id);
-        map.put("error_message", "The bot has been deleted.");
+        map.put("error_message", "SUCCESS! The bot has been deleted.");
 
         return map;
     }
