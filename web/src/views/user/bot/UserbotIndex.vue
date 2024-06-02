@@ -37,7 +37,14 @@
                       </div>
                       <div class="mb-3">
                         <label for="addBotContent" class="form-label" style="font-weight: bold; font-size: 120%;">Code</label>
-                        <textarea v-model="botadd.content" class="form-control" placeholder="Please write the code for your new bot." id="addBotContent" style="height: 300px"></textarea>
+                        <!-- 在线编译器 -->
+                        <VAceEditor
+                          v-model:value="botadd.content"
+                          @init="editorInit"
+                          lang="c_cpp"
+                          theme="textmate"
+                          style="height: 300px"
+                          :options="{fontSize: 16}"  />
                       </div>
                     </form>
                   </div>
@@ -89,7 +96,14 @@
                               </div>
                               <div class="mb-3" style="text-align: left;">
                                 <label for="addBotContent" class="form-label" style="font-weight: bold; font-size: 120%;">Code</label>
-                                <textarea v-model="bot.content" class="form-control" placeholder="Please write the code for your new bot." id="addBotContent" style="height: 300px"></textarea>
+                                <!-- 在线编译器 -->
+                                <VAceEditor
+                                  v-model:value="bot.content"
+                                  @init="editorInit"
+                                  lang="c_cpp"
+                                  theme="textmate"
+                                  style="height: 300px"
+                                  :options="{fontSize: 16}"  />
                               </div>
                             </form>
                           </div>
@@ -118,9 +132,22 @@ import { ref, reactive } from "vue";
 import $ from "jquery";
 import { useStore } from "vuex";
 import { Modal } from "bootstrap/dist/js/bootstrap";
+import { VAceEditor } from 'vue3-ace-editor';
+import ace from 'ace-builds';
 
 export default{
+
+  components: {
+    VAceEditor,
+  },
+
   setup() {
+
+    //将编译器集成进页面的配置
+    ace.config.set(
+    "basePath", 
+    "https://cdn.jsdelivr.net/npm/ace-builds@" + require('ace-builds').version + "/src-noconflict/");
+
     const store = useStore();
     let bots = ref([]);
 
