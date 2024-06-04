@@ -38,13 +38,16 @@
                       <div class="mb-3">
                         <label for="addBotContent" class="form-label" style="font-weight: bold; font-size: 120%;">Code</label>
                         <!-- 在线编译器 -->
-                        <VAceEditor
-                          v-model:value="botadd.content"
-                          @init="editorInit"
-                          lang="c_cpp"
-                          theme="textmate"
-                          style="height: 300px"
-                          :options="{fontSize: 16}"  />
+                        <VAceEditor v-model:value="botadd.content" @init="editorInit" lang="c_cpp"
+                          theme="textmate" style="height: 300px" :options="{
+                              enableBasicAutocompletion: true, //启用基本自动完成
+                              enableSnippets: true, // 启用代码段
+                              enableLiveAutocompletion: true, // 启用实时自动完成
+                              fontSize: 18, //设置字号
+                              tabSize: 4, // 标签大小
+                              showPrintMargin: false, //去除编辑器里的竖线
+                              highlightActiveLine: true,
+                            }" />
                       </div>
                     </form>
                   </div>
@@ -97,13 +100,17 @@
                               <div class="mb-3" style="text-align: left;">
                                 <label for="addBotContent" class="form-label" style="font-weight: bold; font-size: 120%;">Code</label>
                                 <!-- 在线编译器 -->
-                                <VAceEditor
-                                  v-model:value="bot.content"
-                                  @init="editorInit"
-                                  lang="c_cpp"
-                                  theme="textmate"
-                                  style="height: 300px"
-                                  :options="{fontSize: 16}"  />
+                                <VAceEditor v-model:value="bot.content" @init="editorInit"
+                                  lang="c_cpp" theme="textmate" style="height: 300px"
+                                  :options="{
+                                      enableBasicAutocompletion: true, //启用基本自动完成
+                                      enableSnippets: true, // 启用代码段
+                                      enableLiveAutocompletion: true, // 启用实时自动完成
+                                      fontSize: 18, //设置字号
+                                      tabSize: 4, // 标签大小
+                                      showPrintMargin: false, //去除编辑器里的竖线
+                                      highlightActiveLine: true,
+                                    }" />
                               </div>
                             </form>
                           </div>
@@ -134,6 +141,10 @@ import { useStore } from "vuex";
 import { Modal } from "bootstrap/dist/js/bootstrap";
 import { VAceEditor } from 'vue3-ace-editor';
 import ace from 'ace-builds';
+import 'ace-builds/src-noconflict/mode-c_cpp';
+import 'ace-builds/src-noconflict/mode-json';
+import 'ace-builds/src-noconflict/theme-chrome';
+import 'ace-builds/src-noconflict/ext-language_tools';
 
 export default{
 
@@ -145,8 +156,11 @@ export default{
 
     //将编译器集成进页面的配置
     ace.config.set(
-    "basePath", 
-    "https://cdn.jsdelivr.net/npm/ace-builds@" + require('ace-builds').version + "/src-noconflict/");
+      "basePath",
+      "https://cdn.jsdelivr.net/npm/ace-builds@" +
+      require("ace-builds").version +
+      "/src-noconflict/"
+    );
 
     const store = useStore();
     let bots = ref([]);
