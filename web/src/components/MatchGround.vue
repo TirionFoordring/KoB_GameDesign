@@ -1,0 +1,83 @@
+<template>
+  <div class="matchground">
+    <div class="row">
+      <div class="col-6">
+        <div class="user-photo">
+          <img :src="$store.state.user.photo" alt="">
+        </div>
+        <div class="user-username">
+          {{ $store.state.user.username }}
+        </div>
+      </div>
+
+      <div class="col-6">
+        <div class="user-photo">
+          <img :src="$store.state.pk.opponent_photo" alt="">
+        </div>
+        <div class="user-username">
+          {{ $store.state.pk.opponent_username }}
+        </div>
+      </div>
+
+      <div class="col-12" style="text-align: center; padding-top: 18vh;">
+        <button @click="click_match_btn" type="button" :class="[match_btn_isClicked ? 'btn btn-lg btn-dark' : 'btn btn-lg btn-primary']">{{ match_btn_info }}</button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import { ref } from "vue";
+
+export default {
+  setup() {
+    const match_btn_isClicked = ref(false);
+    const match_btn_info = ref("Start Matching");
+
+    const click_match_btn = () => {
+      if(!match_btn_isClicked.value){
+        match_btn_info.value = "Cancel Matching";
+      } else {
+        match_btn_info.value = "Start Matching";
+      }
+      match_btn_isClicked.value = !match_btn_isClicked.value;
+    }
+    
+    return {
+      match_btn_info,
+      click_match_btn,
+      match_btn_isClicked,
+    }
+  }
+}
+</script>
+
+
+<style scoped>
+div.matchground{
+  width: 60vw;  /*60vw代表屏幕宽度的60%*/
+  height: 70vh; /*70vh代表屏幕高度的70%*/
+  margin: 25px auto 0px;
+  background-image: url("../img/matchground-background.jpg");
+  background-size: cover;
+  background-position: center;
+}
+
+div.user-photo {
+  text-align: center;
+  padding-top: 8vh;
+}
+
+div.user-photo > img {
+  border-radius: 50%;
+  width: 20vh;
+}
+
+div.user-username {
+  color: white;
+  text-align: center;
+  font-size: 35px;
+  font-weight: 600;
+  padding-top: 2vh;
+}
+</style>
