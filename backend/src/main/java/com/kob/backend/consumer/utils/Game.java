@@ -1,25 +1,61 @@
 package com.kob.backend.consumer.utils;
 
+import com.alibaba.fastjson2.JSONObject;
+import com.kob.backend.consumer.WebSocketServer;
+
+import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.locks.ReentrantLock;
 
 //该类用于在云端生成地图，将匹配的两个用户的游戏进行同步
-public class Game {
+public class Game extends Thread {
     final private Integer rows;
     final private Integer cols;
     final private Integer inner_walls_number;
     final private int[][] g;
     final private int[] dx = {-1, 0, 1, 0};
     final private int[] dy = {0, 1, 0, -1};
+    final private Player playerA, playerB;
+    private Integer nextStepA = null;
+    private Integer nextStepB = null;
+    private ReentrantLock lock = new ReentrantLock();
+    private String gameStatus = "Playing"; //表示整局游戏的状态，Playing表示正在进行，End表示游戏结束
+    private String loser = ""; //表示游戏的败方，all表示平局
 
-    public Game(Integer rows, Integer cols, Integer inner_walls_number) {
+    public Game(Integer rows, Integer cols, Integer inner_walls_number, Integer idA, Integer idB) {
         this.rows = rows;
         this.cols = cols;
         this.inner_walls_number = inner_walls_number;
         this.g = new int[rows][cols];
+        playerA = new Player(idA, this.rows - 2, 1, new ArrayList<>());
+        playerB = new Player(idB, 1, this.cols - 2, new ArrayList<>());
     }
+
+    public Player getPlayerA() { return playerA; }
+
+    public Player getPlayerB() { return playerB; }
 
     public int[][] getG(){
         return this.g;
+    }
+
+    //用锁将线程锁起来防止多个线程同时写一个变量时造成冲突
+    public void setNextStepA(Integer nextStepA) {
+        lock.lock();
+        try{
+            this.nextStepA = nextStepA;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public void setNextStepB(Integer nextStepB) {
+        lock.lock();
+        try{
+            this.nextStepB = nextStepB;
+        } finally {
+            lock.unlock();
+        }
     }
 
     private boolean drawMap(){
@@ -81,6 +117,99 @@ public class Game {
         for (int i = 0; i < 1000; i++) {
             if (drawMap())
                 break;
+        }
+    }
+
+    //等待两名玩家的下一步操作
+    private boolean nextStep(){
+
+        try {
+            Thread.sleep(200);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        //超过5秒钟无下一步操作判负
+        for (int i = 0; i < 5; i++) {
+            try {
+                Thread.sleep(1000);
+                lock.lock();
+                try {
+                    if (nextStepA != null && nextStepB != null) {
+                        playerA.getSteps().add(nextStepA);
+                        playerB.getSteps().add(nextStepB);
+                        return true;
+                    }
+                } finally {
+                    lock.unlock();
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
+
+    //判断两名玩家的下一步操作是否合法
+    private void judge(){
+
+    }
+
+    private void sendAllMessage(String message){
+        WebSocketServer.users.get(playerA.getId()).sendMessage(message);
+        WebSocketServer.users.get(playerB.getId()).sendMessage(message);
+    }
+
+    //向两名玩家分别返回对手的操作，同步游戏信息
+    private void updateMove(){
+        lock.lock();
+        try{
+            JSONObject resp = new JSONObject();
+            resp.put("event", "move");
+            resp.put("a_move", this.nextStepA);
+            resp.put("b_move", this.nextStepB);
+            nextStepA = nextStepB = null;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    //向两名玩家返回游戏结局
+    private void sendResult(){
+        JSONObject resp = new JSONObject();
+        resp.put("event", "result");
+        resp.put("loser", this.loser);
+        sendAllMessage(resp.toJSONString());
+    }
+
+    @Override
+    public void run() {
+        for (int i = 0; i < 1000; i++) {
+            //先判断是否把两条蛇的下一步操作都获取到了
+            if (nextStep()){
+                judge();
+                if ("Playing".equals(this.gameStatus)) {
+                    updateMove();
+                } else {
+                    sendResult();
+                    break;
+                }
+            } else {
+                this.gameStatus = "End";
+                lock.lock();
+                try {
+                    if (nextStepA == null && nextStepB == null) {
+                        this.loser = "all";
+                    } else if (nextStepA == null) {
+                        this.loser = "A";
+                    } else {
+                        this.loser = "B";
+                    }
+                } finally {
+                    lock.unlock();
+                }
+                break;
+            }
         }
     }
 }

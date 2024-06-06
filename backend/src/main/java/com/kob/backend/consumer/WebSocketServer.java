@@ -15,7 +15,6 @@ import jakarta.websocket.server.ServerEndpoint;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 //
@@ -24,7 +23,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 public class WebSocketServer {
 
     //用线程安全的ConcurrentHashMap存储所有链接（每个链接是一个用户）
-    private static ConcurrentHashMap<Integer, WebSocketServer> users = new ConcurrentHashMap<>();
+    public static ConcurrentHashMap<Integer, WebSocketServer> users = new ConcurrentHashMap<>();
     //线程安全的匹配池
     private static CopyOnWriteArraySet<User> matchpool = new CopyOnWriteArraySet<>();
 
@@ -32,6 +31,7 @@ public class WebSocketServer {
     private Session session = null;
 
     private static UserMapper userMapper;
+    private Game game = null;
 
     @Autowired
     public void setUserMapper(UserMapper userMapper) {
@@ -76,21 +76,37 @@ public class WebSocketServer {
             matchpool.remove(a);
             matchpool.remove(b);
 
-            Game game = new Game(13, 14, 20);
+            //将两名玩家的一局游戏生成一个新的Game类的实例
+            Game game = new Game(13, 14, 20, a.getId(), b.getId());
             game.createMap();
+            //开启这个实例的线程（即，每两名玩家的一局游戏均是一个线程）
+            game.start();
+
+            users.get(a.getId()).game = game;
+            users.get(b.getId()).game = game;
+
+            //将地图相关信息封装成JSON
+            JSONObject respGame = new JSONObject();
+            respGame.put("a_id", game.getPlayerA().getId());
+            respGame.put("a_sx", game.getPlayerA().getSx());
+            respGame.put("a_sy", game.getPlayerA().getSy());
+            respGame.put("b_id", game.getPlayerB().getId());
+            respGame.put("b_sx", game.getPlayerB().getSx());
+            respGame.put("b_sy", game.getPlayerB().getSy());
+            respGame.put("map", game.getG());
 
             JSONObject respA = new JSONObject();
             respA.put("event", "start-game");
             respA.put("opponent_username", b.getUsername());
             respA.put("opponent_photo", b.getPhoto());
-            respA.put("gamemap", game.getG());
+            respA.put("game", respGame);
             users.get(a.getId()).sendMessage(respA.toJSONString());
 
             JSONObject respB = new JSONObject();
             respB.put("event", "start-game");
             respB.put("opponent_username", a.getUsername());
             respB.put("opponent_photo", a.getPhoto());
-            respB.put("gamemap", game.getG());
+            respB.put("game", respGame);
             users.get(b.getId()).sendMessage(respB.toJSONString());
         }
 
@@ -100,6 +116,14 @@ public class WebSocketServer {
     private void cancelMatching(){
         System.out.println("cancelMatching");
         matchpool.remove(this.user);
+    }
+
+    private void move(int direction){
+        if (game.getPlayerA().getId().equals(this.user.getId())){
+            game.setNextStepA(direction);
+        } else if (game.getPlayerB().getId().equals(this.user.getId())){
+            game.setNextStepB(direction);
+        }
     }
 
     @OnMessage
@@ -112,6 +136,8 @@ public class WebSocketServer {
             startMatching();
         } else if ("cancel-matching".equals(event)) {
             cancelMatching();
+        } else if ("move".equals(event)) {
+            move(data.getInteger("direction"));
         }
     }
 
