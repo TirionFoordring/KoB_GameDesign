@@ -5,15 +5,18 @@
 </template>
 
 <script>
-import { Game_Map } from '@/assets/script/GameMap.js'
-import { ref, onMounted } from "vue" //onMounted表示挂载完后需要执行的操作
+import { Game_Map } from '@/assets/script/GameMap.js';
+import { ref, onMounted } from "vue"; //onMounted表示挂载完后需要执行的操作
+import { useStore } from "vuex";
+
 export default {
     setup() {
+        const store = useStore();
         let parent = ref(null);
         let canvas = ref(null);
 
         onMounted(() => {
-            new Game_Map(canvas.value.getContext('2d'), parent.value);
+            new Game_Map(canvas.value.getContext('2d'), parent.value, store);
         });
 
         return{
