@@ -1,8 +1,6 @@
 <template>
     <div class="playground">
-        <GameMap>
-
-        </GameMap>
+        <GameMap></GameMap>
     </div>
 </template>
 

@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.kob.backend.consumer.WebSocketServer;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -130,9 +131,9 @@ public class Game extends Thread {
         }
 
         //超过5秒钟无下一步操作判负
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < 150; i++) {
             try {
-                Thread.sleep(1000);
+                Thread.sleep(100);
                 lock.lock();
                 try {
                     if (nextStepA != null && nextStepB != null) {
@@ -147,13 +148,46 @@ public class Game extends Thread {
                 e.printStackTrace();
             }
         }
-        System.out.println("Failed to get both next steps in time.");
+//        System.out.println("Failed to get both next steps in time.");
         return false;
+    }
+
+    private boolean checkValid(List<Cell> cellsA, List<Cell> cellsB){
+        int n = cellsA.size();
+        Cell tail = cellsA.get(n - 1);
+
+        //不能撞墙
+        if (g[tail.x][tail.y] == 1) return false;
+
+        //不能碰到自己或对手的身体
+        for (int i = 0; i < n - 1; i++) {
+            if (cellsA.get(i).x == tail.x && cellsA.get(i).y == tail.y) return false;
+        }
+        for (int i = 0; i < n - 1; i++) {
+            if (cellsB.get(i).x == tail.x && cellsB.get(i).y == tail.y) return false;
+        }
+
+        return true;
     }
 
     //判断两名玩家的下一步操作是否合法
     private void judge(){
+        //先把两条蛇的身体都取出来
+        List<Cell> cellsA = playerA.getCells();
+        List<Cell> cellsB = playerB.getCells();
 
+        boolean validA = checkValid(cellsA, cellsB);
+        boolean validB = checkValid(cellsB, cellsA);
+        if (!validA || !validB){
+            this.gameStatus = "End";
+            if (!validA && !validB){
+                this.loser = "all";
+            } else if (!validB) {
+                this.loser = "B";
+            } else {
+                this.loser = "A";
+            }
+        }
     }
 
     private void sendAllMessage(String message){
@@ -214,6 +248,7 @@ public class Game extends Thread {
                 } finally {
                     lock.unlock();
                 }
+                sendResult();
                 break;
             }
         }

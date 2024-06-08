@@ -14,7 +14,7 @@ export class snake extends Base_Object {
         this.next_cell = null; //下一步的目标位置
 
         this.speed = 5; //蛇每秒钟走5个格子
-        this.status = "idle"; //蛇的当前状态，idle表示精致，move表示正在移动，die表示死亡
+        this.status = "idle"; //蛇的当前状态，idle表示静止，move表示正在移动，die表示死亡
         this.direction = -1; //direction为下一步的指令，-1表示没有指令，0 1 2 3对应上 右 下 左
         this.dr = [-1, 0, 1, 0];
         this.dc = [0, 1, 0, -1];
@@ -61,11 +61,6 @@ export class snake extends Base_Object {
         for (let i = k; i > 0; i--) {
             this.cells[i] = JSON.parse(JSON.stringify(this.cells[i - 1]));
         }
-
-        if (!this.gamemap.check_valid(this.next_cell)) {
-            this.status = "die";
-        }
-
     }
 
     update_move() {
