@@ -38,6 +38,7 @@ export default {
 
             socket.onmessage = msg => {
                 const data = JSON.parse(msg.data);
+                console.log("Received message:", data);
                 if (data.event === "start-game") {
                     store.commit("updateOpponent", {
                         username: data.opponent_username,
@@ -48,14 +49,16 @@ export default {
                     }, 2000);
                     store.commit("updateGame", data.game);
                 } else if (data.event === "move"){
+                    console.log("Move event received:", data);
                     const game = store.state.pk.gameObject;
                     const [snake0, snake1] = game.snakes;
                     snake0.set_direction(data.a_move);
-                    snake1.set_direction(data.b_move); //a.move和b.move变量名在后端Game.java文件中定义
+                    snake1.set_direction(data.b_move);
                 } else if (data.event === "result"){
-                    console.log(data);
+                    console.log("Game result:", data);
                 }
             }
+
 
             socket.onclose = () => {
                 console.log("Disconnected successfully.");

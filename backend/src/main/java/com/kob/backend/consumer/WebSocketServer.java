@@ -121,8 +121,10 @@ public class WebSocketServer {
     private void move(int direction){
         if (game.getPlayerA().getId().equals(this.user.getId())){
             game.setNextStepA(direction);
+            System.out.println("Player A moved: " + direction);
         } else if (game.getPlayerB().getId().equals(this.user.getId())){
             game.setNextStepB(direction);
+            System.out.println("Player B moved: " + direction);
         }
     }
 

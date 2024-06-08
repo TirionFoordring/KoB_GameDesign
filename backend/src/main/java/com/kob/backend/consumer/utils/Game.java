@@ -130,7 +130,7 @@ public class Game extends Thread {
         }
 
         //超过5秒钟无下一步操作判负
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 50; i++) {
             try {
                 Thread.sleep(1000);
                 lock.lock();
@@ -147,6 +147,7 @@ public class Game extends Thread {
                 e.printStackTrace();
             }
         }
+        System.out.println("Failed to get both next steps in time.");
         return false;
     }
 
@@ -168,11 +169,14 @@ public class Game extends Thread {
             resp.put("event", "move");
             resp.put("a_move", this.nextStepA);
             resp.put("b_move", this.nextStepB);
+            System.out.println("Sending move event: " + resp.toJSONString());
+            sendAllMessage(resp.toJSONString());
             nextStepA = nextStepB = null;
         } finally {
             lock.unlock();
         }
     }
+
 
     //向两名玩家返回游戏结局
     private void sendResult(){
@@ -185,10 +189,12 @@ public class Game extends Thread {
     @Override
     public void run() {
         for (int i = 0; i < 1000; i++) {
+            System.out.println("this.status = " + this.gameStatus);
             //先判断是否把两条蛇的下一步操作都获取到了
             if (nextStep()){
                 judge();
                 if ("Playing".equals(this.gameStatus)) {
+                    System.out.println("Calling updateMove()");
                     updateMove();
                 } else {
                     sendResult();
