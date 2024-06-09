@@ -4,6 +4,7 @@ package com.kob.backend.consumer;
 import com.alibaba.fastjson2.JSONObject;
 import com.kob.backend.consumer.utils.Game;
 import com.kob.backend.consumer.utils.JwtAuthentication;
+import com.kob.backend.mapper.RecordMapper;
 import com.kob.backend.mapper.UserMapper;
 import com.kob.backend.pojo.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,11 +32,17 @@ public class WebSocketServer {
     private Session session = null;
 
     private static UserMapper userMapper;
+    public static RecordMapper recordMapper;
     private Game game = null;
 
     @Autowired
     public void setUserMapper(UserMapper userMapper) {
         WebSocketServer.userMapper = userMapper;
+    }
+
+    @Autowired
+    public void setRecordMapper(RecordMapper recordMapper) {
+        WebSocketServer.recordMapper = recordMapper;
     }
 
     @OnOpen
@@ -131,7 +138,7 @@ public class WebSocketServer {
     @OnMessage
     public void onMessage(String message, Session session) { //此函数通常被当做路由使用（即做很多条件判断，判断接下来应该交给哪个函数处理）
         // 从Client接收消息
-        System.out.println("received message: " + message);
+//        System.out.println("received message: " + message);
         JSONObject data = JSONObject.parseObject(message);
         String event = data.getString("event"); //对应前端MatchGround.vue中向后端传入消息的event
         if ("start-matching".equals(event)) {

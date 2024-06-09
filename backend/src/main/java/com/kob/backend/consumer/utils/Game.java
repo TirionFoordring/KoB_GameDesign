@@ -2,8 +2,10 @@ package com.kob.backend.consumer.utils;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.kob.backend.consumer.WebSocketServer;
+import com.kob.backend.pojo.Record;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.locks.ReentrantLock;
@@ -203,7 +205,7 @@ public class Game extends Thread {
             resp.put("event", "move");
             resp.put("a_move", this.nextStepA);
             resp.put("b_move", this.nextStepB);
-            System.out.println("Sending move event: " + resp.toJSONString());
+//            System.out.println("Sending move event: " + resp.toJSONString());
             sendAllMessage(resp.toJSONString());
             nextStepA = nextStepB = null;
         } finally {
@@ -211,6 +213,36 @@ public class Game extends Thread {
         }
     }
 
+    //将地图的数组转化为字符串，用于存储在数据库中
+    private String getMapString(){
+        StringBuilder resp = new StringBuilder();
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                resp.append(this.g[i][j]);
+            }
+        }
+        return resp.toString();
+    }
+
+    //获取对局记录的辅助函数，用于存储在数据库中
+    private void saveRecord(){
+        Record record = new Record(
+                null,
+                playerA.getId(),
+                playerA.getSx(),
+                playerA.getSy(),
+                playerB.getId(),
+                playerB.getSx(),
+                playerB.getSy(),
+                playerA.getStepsString(),
+                playerB.getStepsString(),
+                getMapString(),
+                this.loser,
+                new Date()
+        );
+//        System.out.println("Record saved");
+        WebSocketServer.recordMapper.insert(record);
+    }
 
     //向两名玩家返回游戏结局
     private void sendResult(){
@@ -223,18 +255,19 @@ public class Game extends Thread {
     @Override
     public void run() {
         for (int i = 0; i < 1000; i++) {
-            System.out.println("this.status = " + this.gameStatus);
+//            System.out.println("this.status = " + this.gameStatus);
             //先判断是否把两条蛇的下一步操作都获取到了
             if (nextStep()){
                 judge();
                 if ("Playing".equals(this.gameStatus)) {
-                    System.out.println("Calling updateMove()");
+//                    System.out.println("Calling updateMove()");
                     updateMove();
                 } else {
-                    sendResult();
+                    saveRecord(); //保存对局记录
+                    sendResult(); //向前端发送对局结果
                     break;
                 }
-            } else {
+            } else { //没有操作则返回超时的一方判负
                 this.gameStatus = "End";
                 lock.lock();
                 try {
@@ -248,7 +281,8 @@ public class Game extends Thread {
                 } finally {
                     lock.unlock();
                 }
-                sendResult();
+                saveRecord(); //保存对局记录
+                sendResult(); //向前端发送对局结果
                 break;
             }
         }
