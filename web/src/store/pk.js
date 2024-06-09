@@ -15,6 +15,7 @@ export default {
         b_sx: 0,
         b_sy: 0,
         gameObject: null,
+        loser: "none", //none表示游戏正在进行中，all为平局，A/B代表胜负方
     },
     getters: {
     },
@@ -41,6 +42,9 @@ export default {
         },
         updateGameObject(state, gameObject) {
             state.gameObject = gameObject;
+        },
+        updateLoser(state, loser) {
+            state.loser = loser;
         }
     },
     actions: {

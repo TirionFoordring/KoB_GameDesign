@@ -3,7 +3,7 @@
 
     <matchground v-if="$store.state.pk.status === 'matching'"></matchground>
 
-    <ResultBoard></ResultBoard>
+    <ResultBoard v-if="$store.state.pk.loser !== 'none'"></ResultBoard>
 </template>
 
 <script>
@@ -55,6 +55,7 @@ export default {
                     snake1.set_direction(data.b_move);
                 } else if (data.event === "result"){
                     console.log("Game result:", data);
+                    store.commit("updateLoser", data.loser); // 将败方从后端传来的msg中提取出来，并更新到全局变量
                     const game = store.state.pk.gameObject;
                     const [snake0, snake1] = game.snakes;
 
