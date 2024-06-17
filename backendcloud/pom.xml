@@ -23,6 +23,7 @@
     <modules>
         <module>matchingsystem</module>
         <module>backend</module>
+        <module>botrunningsystem</module>
     </modules>
     <packaging>pom</packaging>
 
