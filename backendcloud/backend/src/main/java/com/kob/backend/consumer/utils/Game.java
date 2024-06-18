@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.locks.ReentrantLock;
 
-//该类用于在云端生成地图，将匹配的两个用户的游戏进行同步
+// 该类用于在云端生成地图，将匹配的两个用户的游戏进行同步
 public class Game extends Thread {
     final private Integer rows;
     final private Integer cols;
@@ -22,8 +22,8 @@ public class Game extends Thread {
     private Integer nextStepA = null;
     private Integer nextStepB = null;
     private ReentrantLock lock = new ReentrantLock();
-    private String gameStatus = "Playing"; //表示整局游戏的状态，Playing表示正在进行，End表示游戏结束
-    private String loser = ""; //表示游戏的败方，all表示平局
+    private String gameStatus = "Playing"; // 表示整局游戏的状态，Playing表示正在进行，End表示游戏结束
+    private String loser = ""; // 表示游戏的败方，all表示平局
 
     public Game(Integer rows, Integer cols, Integer inner_walls_number, Integer idA, Integer idB) {
         this.rows = rows;
@@ -42,7 +42,7 @@ public class Game extends Thread {
         return this.g;
     }
 
-    //用锁将线程锁起来防止多个线程同时写一个变量时造成冲突
+    // 用锁将线程锁起来防止多个线程同时写一个变量时造成冲突
     public void setNextStepA(Integer nextStepA) {
         lock.lock();
         try{
@@ -62,14 +62,14 @@ public class Game extends Thread {
     }
 
     private boolean drawMap(){
-        //初始化所有格子为空地（0）
+        // 初始化所有格子为空地（0）
         for (int i = 0; i < this.rows; i++) {
             for (int j = 0; j < this.cols; j++) {
                 this.g[i][j] = 0;
             }
         }
 
-        //给四周增加墙壁
+        // 给四周增加墙壁
         for (int r = 0; r < this.rows; r++) {
             this.g[r][0] = this.g[r][this.cols - 1] = 1;
         }
@@ -77,16 +77,16 @@ public class Game extends Thread {
             this.g[0][c] = this.g[this.rows - 1][c] = 1;
         }
 
-        //随机生成内部障碍物
+        // 随机生成内部障碍物
         Random random = new Random();
         for (int i = 0; i < inner_walls_number/2; i++) {
             for (int j = 0; j < 1000; j++){
                 int r = random.nextInt(this.rows);
                 int c = random.nextInt(this.cols);
 
-                //如果此处已经是墙壁了，重新随机
+                // 如果此处已经是墙壁了，重新随机
                 if (this.g[r][c] == 1 || this.g[this.rows - 1 - r][this.cols - 1 - c] == 1) continue;
-                //左下角和右上角禁止生成墙壁
+                // 左下角和右上角禁止生成墙壁
                 if ((r == this.rows - 2) && (c == 1) || (r == 1) && (c == this.cols - 2)) continue;
 
                 this.g[r][c] = 1;
@@ -98,7 +98,7 @@ public class Game extends Thread {
         return connectivity(this.rows - 2, 1, 1, this.cols - 2);
     }
 
-    //检验两名玩家间的连通性
+    // 检验两名玩家间的连通性
     private boolean connectivity(int sx, int sy, int tx, int ty){
         if (sx == tx && sy == ty) return true;
         this.g[sx][sy] = 1;
@@ -117,14 +117,14 @@ public class Game extends Thread {
         return false;
     }
 
-    public void createMap(){ //执行1000次画地图
+    public void createMap(){ // 执行1000次画地图
         for (int i = 0; i < 1000; i++) {
             if (drawMap())
                 break;
         }
     }
 
-    //等待两名玩家的下一步操作
+    // 等待两名玩家的下一步操作
     private boolean nextStep(){
 
         try {
@@ -133,7 +133,7 @@ public class Game extends Thread {
             throw new RuntimeException(e);
         }
 
-        //超过5秒钟无下一步操作判负
+        // 超过15秒钟无下一步操作判负
         for (int i = 0; i < 150; i++) {
             try {
                 Thread.sleep(100);
@@ -159,10 +159,10 @@ public class Game extends Thread {
         int n = cellsA.size();
         Cell tail = cellsA.get(n - 1);
 
-        //不能撞墙
+        // 不能撞墙
         if (g[tail.x][tail.y] == 1) return false;
 
-        //不能碰到自己或对手的身体
+        // 不能碰到自己或对手的身体
         for (int i = 0; i < n - 1; i++) {
             if (cellsA.get(i).x == tail.x && cellsA.get(i).y == tail.y) return false;
         }
@@ -173,9 +173,9 @@ public class Game extends Thread {
         return true;
     }
 
-    //判断两名玩家的下一步操作是否合法
+    // 判断两名玩家的下一步操作是否合法
     private void judge(){
-        //先把两条蛇的身体都取出来
+        // 先把两条蛇的身体都取出来
         List<Cell> cellsA = playerA.getCells();
         List<Cell> cellsB = playerB.getCells();
 
@@ -202,7 +202,7 @@ public class Game extends Thread {
         }
     }
 
-    //向两名玩家分别返回对手的操作，同步游戏信息
+    // 向两名玩家分别返回对手的操作，同步游戏信息
     private void updateMove(){
         lock.lock();
         try{
@@ -218,7 +218,7 @@ public class Game extends Thread {
         }
     }
 
-    //将地图的数组转化为字符串，用于存储在数据库中
+    // 将地图的数组转化为字符串，用于存储在数据库中
     private String getMapString(){
         StringBuilder resp = new StringBuilder();
         for (int i = 0; i < rows; i++) {
@@ -229,7 +229,7 @@ public class Game extends Thread {
         return resp.toString();
     }
 
-    //获取对局记录的辅助函数，用于存储在数据库中
+    // 获取对局记录的辅助函数，用于存储在数据库中
     private void saveRecord(){
         Record record = new Record(
                 null,
@@ -249,7 +249,7 @@ public class Game extends Thread {
         WebSocketServer.recordMapper.insert(record);
     }
 
-    //向两名玩家返回游戏结局
+    // 向两名玩家返回游戏结局
     private void sendResult(){
         JSONObject resp = new JSONObject();
         resp.put("event", "result");
@@ -261,18 +261,18 @@ public class Game extends Thread {
     public void run() {
         for (int i = 0; i < 1000; i++) {
 //            System.out.println("this.status = " + this.gameStatus);
-            //先判断是否把两条蛇的下一步操作都获取到了
+            // 先判断是否把两条蛇的下一步操作都获取到了
             if (nextStep()){
                 judge();
                 if ("Playing".equals(this.gameStatus)) {
 //                    System.out.println("Calling updateMove()");
                     updateMove();
                 } else {
-                    saveRecord(); //保存对局记录
-                    sendResult(); //向前端发送对局结果
+                    saveRecord(); // 保存对局记录
+                    sendResult(); // 向前端发送对局结果
                     break;
                 }
-            } else { //没有操作则返回超时的一方判负
+            } else { // 没有操作则返回超时的一方判负
                 this.gameStatus = "End";
                 lock.lock();
                 try {
@@ -286,8 +286,8 @@ public class Game extends Thread {
                 } finally {
                     lock.unlock();
                 }
-                saveRecord(); //保存对局记录
-                sendResult(); //向前端发送对局结果
+                saveRecord(); // 保存对局记录
+                sendResult(); // 向前端发送对局结果
                 break;
             }
         }
