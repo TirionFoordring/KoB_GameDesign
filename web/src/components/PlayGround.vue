@@ -8,7 +8,7 @@
 import GameMap from "./GameMap.vue"
 export default {
     components:{
-        GameMap
+        GameMap,
     }
 }
 

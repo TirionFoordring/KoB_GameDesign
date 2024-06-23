@@ -1,5 +1,6 @@
 <template>
     <playground v-if="$store.state.pk.status === 'playing'"></playground>
+    <pkInformation v-if="$store.state.pk.status === 'playing'"></pkInformation>
 
     <matchground v-if="$store.state.pk.status === 'matching'"></matchground>
 
@@ -8,6 +9,7 @@
 
 <script>
 import playground from "../../components/PlayGround.vue";
+import pkInformation from "../../components/PkInformation.vue";
 import { onMounted, onUnmounted } from "vue";
 import { useStore } from "vuex";
 import matchground from "../../components/MatchGround.vue";
@@ -18,6 +20,7 @@ export default {
         playground,
         matchground,
         ResultBoard,
+        pkInformation,
     },
     setup() {
         const store = useStore();
