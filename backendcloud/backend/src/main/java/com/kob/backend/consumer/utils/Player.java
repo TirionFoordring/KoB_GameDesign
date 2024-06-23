@@ -12,6 +12,8 @@ import java.util.List;
 @AllArgsConstructor
 public class Player {
     private Integer id;
+    private Integer botId; // botId = -1 则表示人工操作
+    private String botCode;
     private Integer sx;
     private Integer sy;
     private List<Integer> steps;
@@ -45,6 +47,7 @@ public class Player {
         return res;
     }
 
+    // 获取操作序列
     public String getStepsString(){
         StringBuilder resp = new StringBuilder();
         for (Integer s : steps){

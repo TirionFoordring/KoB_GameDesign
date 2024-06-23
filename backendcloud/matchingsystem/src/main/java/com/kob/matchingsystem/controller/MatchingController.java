@@ -19,7 +19,8 @@ public class MatchingController {
         //先将userId和ranking取出
         Integer userId = Integer.parseInt(Objects.requireNonNull(data.getFirst("userId")));
         Integer ranking = Integer.parseInt(Objects.requireNonNull(data.getFirst("ranking")));
-        return matchingService.addPlayer(userId, ranking);
+        Integer botId = Integer.parseInt(Objects.requireNonNull(data.getFirst("bot_id")));
+        return matchingService.addPlayer(userId, ranking, botId);
     }
 
     @PostMapping("/player/remove/")

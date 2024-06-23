@@ -172,7 +172,7 @@ export default{
       error_message: "",
     });
 
-    //刷新前段显示bot的列表，实现方法：调用后端的getList这个api，遍历所有当前登录用户的bot
+    //刷新前端显示bot的列表，实现方法：调用后端的getList这个api，遍历所有当前登录用户的bot
     const refresh_bots = () => {
       $.ajax({
         url: "http://localhost:3000/user/bot/getlist/",

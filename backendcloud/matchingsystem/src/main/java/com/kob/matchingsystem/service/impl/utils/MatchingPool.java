@@ -22,10 +22,10 @@ public class MatchingPool extends Thread{
         MatchingPool.restTemplate = restTemplate;
     }
 
-    public void addPlayer(Integer userId, Integer ranking){
+    public void addPlayer(Integer userId, Integer ranking, Integer botId){
         lock.lock();
         try {
-            players.add(new Player(userId, ranking, 0));
+            players.add(new Player(userId, ranking, botId,0));
         } finally {
             lock.unlock();
         }
@@ -60,12 +60,14 @@ public class MatchingPool extends Thread{
         return rankingDelta <= waitingTime * 10;
     }
 
-    //返回a和b的匹配结果
+    //向后端的StartGameController返回a和b的匹配结果
     private void sendResult(Player a, Player b){
         System.out.println("send result: " + a + " " + b);
         MultiValueMap<String, String> data = new LinkedMultiValueMap<>();
         data.add("aId", a.getUserId().toString());
+        data.add("a_botId", a.getBotId().toString());
         data.add("bId", b.getUserId().toString());
+        data.add("b_botId", b.getBotId().toString());
         restTemplate.postForObject(startGameUrl, data, String.class);
     }
 
