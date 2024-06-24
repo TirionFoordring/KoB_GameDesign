@@ -26,6 +26,9 @@ export default {
         const store = useStore();
         const socketUrl = `ws://localhost:3000/websocket/${store.state.user.token}`; //此处由于链接内有表达式，所以必须用``来将链接括起来
 
+        // 每次点开homepage时先更新一下updateLoser为none，防止显示结果的模态框未被清除
+        store.commit("updateLoser", "none");
+
         let socket = null;
         onMounted(() => {
             store.commit("updateOpponent", {
