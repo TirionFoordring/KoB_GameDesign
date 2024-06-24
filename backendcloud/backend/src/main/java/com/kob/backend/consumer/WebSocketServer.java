@@ -68,7 +68,7 @@ public class WebSocketServer {
     public void onOpen(Session session, @PathParam("token") String token) throws IOException {
         //建立链接
         this.session = session;
-        System.out.println("Connected successfully.");
+//        System.out.println("Connected successfully.");
         Integer userId = JwtAuthentication.getUserId(token);
         this.user = userMapper.selectById(userId);
 
@@ -78,13 +78,13 @@ public class WebSocketServer {
             this.session.close();
         }
 
-        System.out.println(users);
+//        System.out.println(users);
     }
 
     @OnClose
     public void onClose() {
         // 关闭链接(退出界面)
-        System.out.println("Disconnected successfully.");
+//        System.out.println("Disconnected successfully.");
         if (this.user != null) {
             users.remove(this.user.getId());
         }
@@ -143,7 +143,7 @@ public class WebSocketServer {
 
     //开始匹配
     private void startMatching(Integer botId){
-        System.out.println("startMatching");
+//        System.out.println("startMatching");
         MultiValueMap<String, String> data = new LinkedMultiValueMap<>();
 
         //此处添加的的字段在MatchingController.java中定义
@@ -156,7 +156,7 @@ public class WebSocketServer {
 
     //取消匹配
     private void cancelMatching(){
-        System.out.println("cancelMatching");
+//        System.out.println("cancelMatching");
         MultiValueMap<String, String> data = new LinkedMultiValueMap<>();
 
         data.add("userId", this.user.getId().toString());
@@ -170,13 +170,13 @@ public class WebSocketServer {
             // 如果是人工操作再去获取人的操作，否则屏蔽掉人的操作
             if (game.getPlayerA().getBotId() == -1){
                 game.setNextStepA(direction);
-                System.out.println("Player A moved: " + direction);
+//                System.out.println("Player A moved: " + direction);
             }
         } else if (game.getPlayerB().getId().equals(this.user.getId())){
             // 如果是人工操作再去获取人的操作，否则屏蔽掉人的操作
             if (game.getPlayerB().getBotId() == -1){
                 game.setNextStepB(direction);
-                System.out.println("Player B moved: " + direction);
+//                System.out.println("Player B moved: " + direction);
             }
         }
     }

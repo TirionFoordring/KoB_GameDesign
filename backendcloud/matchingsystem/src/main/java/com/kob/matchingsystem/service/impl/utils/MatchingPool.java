@@ -62,7 +62,7 @@ public class MatchingPool extends Thread{
 
     //向后端的StartGameController返回a和b的匹配结果
     private void sendResult(Player a, Player b){
-        System.out.println("send result: " + a + " " + b);
+//        System.out.println("send result: " + a + " " + b);
         MultiValueMap<String, String> data = new LinkedMultiValueMap<>();
         data.add("aId", a.getUserId().toString());
         data.add("a_botId", a.getBotId().toString());
@@ -73,7 +73,7 @@ public class MatchingPool extends Thread{
 
     //尝试匹配所有玩家
     private void matchPlayers(){
-        System.out.println("match players: " + players.toString());
+//        System.out.println("match players: " + players.toString());
         boolean[] used = new boolean[players.size()]; //用于存储这名玩家是有已经有人匹配了
 
         for (int i = 0; i < players.size(); i++) {
