@@ -39,7 +39,7 @@ public class SecurityConfig {
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 基于token，不需要session
                 .authorizeHttpRequests((authz) -> authz
                         .requestMatchers("/user/account/token/", "/user/account/register/").permitAll() // 放行api
-                        .requestMatchers("/pk/start/game/").permitAll() // 本地放行
+                        .requestMatchers("/pk/start/game/", "/pk/receive/bot/move/").permitAll() // 本地放行
                         .requestMatchers(HttpMethod.OPTIONS).permitAll()
                         .requestMatchers("/websocket/**").permitAll() // 放行websocket路径
                         .anyRequest().authenticated()

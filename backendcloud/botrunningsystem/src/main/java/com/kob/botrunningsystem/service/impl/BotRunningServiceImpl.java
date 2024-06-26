@@ -12,7 +12,7 @@ public class BotRunningServiceImpl implements BotRunningService {
     @Override
     public String addBot(Integer userId, String botCode, String input) {
         botPool.addBot(userId, botCode, input);
-        System.out.println("Add bot: " + userId + " " + botCode + " " + input);
+//        System.out.println("Add bot: " + userId + " " + botCode + " " + input);
         return "Add bot successfully";
     }
 }

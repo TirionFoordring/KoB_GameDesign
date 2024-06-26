@@ -24,7 +24,7 @@ public class BotPool extends Thread {
     // 该函数为在后端执行用户输入代码的函数
     private void consume(Bot bot){
         Consumer consumer = new Consumer();
-        consumer.startTimeout(2000, bot);
+        consumer.startTimeout(200, bot); //timeout
     }
 
     @Override
