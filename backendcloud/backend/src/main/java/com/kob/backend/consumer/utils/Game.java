@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.kob.backend.consumer.WebSocketServer;
 import com.kob.backend.pojo.Bot;
 import com.kob.backend.pojo.Record;
+import com.kob.backend.pojo.User;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
@@ -282,8 +283,47 @@ public class Game extends Thread {
         return resp.toString();
     }
 
+    // 对战结束后更新玩家天梯积分
+    private void updateUserRanking(Player player, Integer ranking){
+        User user = WebSocketServer.userMapper.selectById(player.getId());
+        user.setRanking(ranking);
+        WebSocketServer.userMapper.updateById(user);
+    }
+
     // 获取对局记录的辅助函数，用于存储在数据库中
     private void saveRecord(){
+        Integer rankingA = WebSocketServer.userMapper.selectById(playerA.getId()).getRanking();
+        Integer rankingB = WebSocketServer.userMapper.selectById(playerB.getId()).getRanking();
+
+        // 调整系数adjustmentFactor可自行确定
+        final double adjustmentFactor = 0.1;
+        // 等级分差值rankingDiff = 胜方等级分 - 败方等级分
+        int rankingDiff = Math.abs(rankingA - rankingB);
+
+        //游戏结束后的等级分更新规则
+        if ("A".equals(this.loser)){
+            rankingB += Math.min(40, (int) (10 + rankingDiff * adjustmentFactor));
+            rankingA -= Math.max(1, (int) (10 - rankingDiff * adjustmentFactor));
+        } else if ("B".equals(this.loser)) {
+            rankingA += Math.min(40, (int) (10 + rankingDiff * adjustmentFactor));
+            rankingB -= Math.max(1, (int) (10 - rankingDiff * adjustmentFactor));
+        } else {
+            // 平局的情况
+            if (rankingA > rankingB) {
+                rankingA += Math.max(1, 5 - (int) (rankingDiff * adjustmentFactor));
+                rankingB += Math.min(10, 5 + (int) (rankingDiff * adjustmentFactor));
+            } else if (rankingB > rankingA) {
+                rankingA += Math.min(10, 5 + (int) (rankingDiff * adjustmentFactor));
+                rankingB += Math.max(1, 5 - (int) (rankingDiff * adjustmentFactor));
+            } else {
+                // 如果两者的等级分相同，双方各加 5 分
+                rankingA += 5;
+                rankingB += 5;
+            }
+        }
+        updateUserRanking(playerA, rankingA);
+        updateUserRanking(playerB, rankingB);
+
         Record record = new Record(
                 null,
                 playerA.getId(),
