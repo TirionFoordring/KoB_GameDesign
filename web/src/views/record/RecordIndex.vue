@@ -41,10 +41,30 @@
             <td>
               <button @click="open_record_view(record.record.id)" type="button" class="btn btn-outline-primary btn-sm">View Record</button>
             </td>
-
           </tr>
         </tbody>
       </table>
+
+      <nav aria-label="Page navigation example" style="float: right; margin-right: 1vw;">
+        <ul class="pagination">
+          <!-- 按钮：前一页 -->
+          <li class="page-item" @click="click_page(-2)">
+            <a class="page-link" href="#" aria-label="Previous">
+              <span aria-hidden="true">pre</span>
+            </a>
+          </li>
+          <li :class="'page-item ' + page.is_active" v-for="page in pages" :key="page.number" @click="click_page(page.number)">
+            <a class="page-link" href="#">{{ page.number }}</a>
+          </li>
+          <!-- 按钮：后一页 -->
+          <li class="page-item" @click="click_page(-1)">
+            <a class="page-link" href="#" aria-label="Next">
+              <span aria-hidden="true">next</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+
 </ContentField>
 </template>
 
@@ -64,6 +84,31 @@ export default {
     let records = ref([]);
     let current_page = 1;
     let total_records = 0;
+    let pages = ref([]);
+
+    const click_page = page => {
+      if (page === -2) page = current_page - 1;
+      else if (page === -1) page = current_page + 1;
+      let max_pages = parseInt(Math.ceil(total_records / 10));
+      if (page >= 1 && page <= max_pages) {
+        pull_page(page);
+      }
+    }
+
+    // 查看记录时的翻页功能
+    const update_pages = () => {
+      let max_pages = parseInt(Math.ceil(total_records / 10));
+      let new_pages = [];
+      for (let i = current_page - 2; i <= current_page + 2; i++) {
+        if (i >= 1 && i <=max_pages) {
+          new_pages.push({
+            number: i,
+            is_active: i === current_page ? "active" : "",
+          });
+        }
+      }
+      pages.value = new_pages;
+    }
 
     const pull_page = page => {
       current_page = page;
@@ -79,7 +124,7 @@ export default {
         success(resp){
           records.value = resp.records;
           total_records = resp.recordsCount; // 该变量名在后端GetRecordListServiceImpl.java文件中定义
-          console.log(total_records);
+          update_pages();
         },
         error(resp) {
           console.log(resp);
@@ -135,6 +180,8 @@ export default {
     return{
       records,
       open_record_view,
+      pages,
+      click_page,
     }
   }
 }
