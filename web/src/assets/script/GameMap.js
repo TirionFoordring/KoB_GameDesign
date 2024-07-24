@@ -58,6 +58,7 @@ export class Game_Map extends Base_Object {
                     snake0.set_direction(parseInt(a_steps[k]));
                     snake1.set_direction(parseInt(b_steps[k]));
                 }
+                k++;
             }, 500); // 每500ms执行一次
         } else {
             this.ctx.canvas.focus();
