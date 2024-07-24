@@ -35,22 +35,49 @@ export class Game_Map extends Base_Object {
 
     //获取用户输入
     add_listening_events() {
-        this.ctx.canvas.focus();
-        this.ctx.canvas.addEventListener("keydown", e => {
-            let d = -1;
-            if (e.key === "w") d = 0;
-            else if (e.key === "d") d = 1;
-            else if (e.key === "s") d = 2;
-            else if (e.key === "a") d = 3;
+        if (this.store.state.record.is_record) {
+            let k = 0;
+            console.log(this.store.state.record);
+            const loser = this.store.state.record.record_loser;
+            const a_steps = this.store.state.record.a_steps;
+            const b_steps = this.store.state.record.b_steps;
+            const [snake0, snake1] = this.snakes;
+            // setInterval用于设置每x毫秒执行一遍某函数
+            const interval_id = setInterval(() => {
+                if (k >= a_steps.length - 1) {
+                    if (loser === "all") {
+                        snake0.status = "die";
+                        snake1.status = "die";
+                    } else if (loser === "A") {
+                        snake0.status = "die";
+                    } else if (loser === "B") {
+                        snake1.status = "die";
+                    }
+                    clearInterval(interval_id);
+                } else {
+                    snake0.set_direction(parseInt(a_steps[k]));
+                    snake1.set_direction(parseInt(b_steps[k]));
+                }
+            }, 500); // 每500ms执行一次
+        } else {
+            this.ctx.canvas.focus();
+            this.ctx.canvas.addEventListener("keydown", e => {
+                let d = -1;
+                if (e.key === "w") d = 0;
+                else if (e.key === "d") d = 1;
+                else if (e.key === "s") d = 2;
+                else if (e.key === "a") d = 3;
 
-            //若进行了合法的移动操作，则向后端传入消息
-            if (d >= 0) {
-                this.store.state.pk.socket.send(JSON.stringify({
-                    event: "move",
-                    direction: d,
-                }));
-            }
-        })
+                //若进行了合法的移动操作，则向后端传入消息
+                if (d >= 0) {
+                    this.store.state.pk.socket.send(JSON.stringify({
+                        event: "move",
+                        direction: d,
+                    }));
+                }
+            })
+
+        }
     }
 
     start() {

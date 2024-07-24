@@ -26,7 +26,7 @@ public class GetRecordListServiceImpl implements GetRecordListService {
 
     @Override
     public JSONObject getList(Integer page) {
-        IPage<Record> recordIPage = new Page<>(page, 20); // 第二个参数size表示每一页里面有多少个项目
+        IPage<Record> recordIPage = new Page<>(page, 10); // 第二个参数size表示每一页里面有多少个项目
         QueryWrapper<Record> queryWrapper = new QueryWrapper<>();
         queryWrapper.orderByDesc("id"); // orderByDesc表示按照降序排列，使得最新的对局记录显示在第一页上
         List<Record> records = recordMapper.selectPage(recordIPage, queryWrapper).getRecords();
@@ -42,11 +42,11 @@ public class GetRecordListServiceImpl implements GetRecordListService {
             item.put("b_username", userB.getUsername());
 
             // 获取对战结果并返回
-            String result = "draw";
+            String result = "Draw";
             if ("A".equals(record.getLoser()))
-                result = "The winner is B.";
+                result = "B";
             else if ("B".equals(record.getLoser()))
-                result = "The winner is A.";
+                result = "A";
 
 
             item.put("result", result);

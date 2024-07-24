@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 // import each pages
 import HomeIndex from "../views/home/HomeIndex.vue";
 import RecordIndex from "../views/record/RecordIndex.vue";
+import RecordView from "../views/record/RecordView.vue";
 import RanklistIndex from "../views/ranklist/RanklistIndex.vue";
 import UserbotIndex from "../views/user/bot/UserbotIndex.vue";
 import NotFound from "../views/error/NotFound.vue";
@@ -32,6 +33,16 @@ const routes = [
     path: "/record/",
     name: "record",
     component: RecordIndex,
+    meta: {
+      requireAuth: true,
+    },
+  },
+
+  // 在path里面使用冒号可以向路由中加入参数
+  {
+    path: "/record/:recordId/",
+    name: "recordView",
+    component: RecordView,
     meta: {
       requireAuth: true,
     },

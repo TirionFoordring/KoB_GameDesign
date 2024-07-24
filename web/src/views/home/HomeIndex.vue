@@ -28,6 +28,8 @@ export default {
 
         // 每次点开homepage时先更新一下updateLoser为none，防止显示结果的模态框未被清除
         store.commit("updateLoser", "none");
+        // 每次点开homepage时先更新一下状态：现在不是录像
+        store.commit("updateIsRecord", false);
 
         let socket = null;
         onMounted(() => {
