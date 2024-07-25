@@ -3,11 +3,26 @@
     <div class="row">
 
       <div class="col-3">
-        <div class="card" style="margin: 20px;">
+        <div class="card" style="margin: 20px 20px 10px;">
           <div class="card-body">
             <img :src="$store.state.user.photo" alt="" style="width: 100%;">
           </div>
         </div>
+
+        <!-- 显示个人信息 -->
+        <div class="card" style="margin: 10px 20px; ">
+          <div class="card-body">
+            <div class="UserInfo">
+              <span style="font-weight: bold;">Username: </span>
+              <span style="float: right;">{{ $store.state.user.username }}</span>
+            </div>
+            <div class="UserInfo">
+              <span style="font-weight: bold;">Ranking: </span>
+              <span style="float: right; color: #00CCFF;">{{ $store.state.user.ranking }}</span>
+            </div>
+          </div>
+        </div>
+
       </div>
 
       <div class="col-9">
@@ -153,7 +168,6 @@ export default{
   },
 
   setup() {
-
     //将编译器集成进页面的配置
     ace.config.set(
       "basePath",
@@ -297,5 +311,10 @@ button#deleteButton {
 
 div#error_message{
   color: red;
+}
+
+div.UserInfo {
+  font-size: 110%;
+  line-height: 180%;
 }
 </style>

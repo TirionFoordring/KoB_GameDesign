@@ -8,6 +8,7 @@ export default {
         id: "",
         username: "",
         photo: "",
+        ranking: "",
         token: "",
         is_login: false,
         pulling_info: true, //是否正在拉去信息，若正在拉去信息则不刷新页面，防止闪屏
@@ -19,6 +20,7 @@ export default {
             state.id = user.id;
             state.username = user.username;
             state.photo = user.photo;
+            state.ranking = user.ranking;
             state.is_login = user.is_login;
         },
         updateToken(state, token) {
