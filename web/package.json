@@ -16,7 +16,8 @@
     "vue": "^3.2.13",
     "vue-router": "^4.0.3",
     "vue3-ace-editor": "^2.2.4",
-    "vuex": "^4.0.0"
+    "vuex": "^4.0.0",
+    "ws": "^8.18.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
