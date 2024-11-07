@@ -12,7 +12,7 @@
             <div class="col-md-8">
               <div class="card-body" style="background-color: #E5E5FF;">
                 <h4 class="card-title" style="font-weight: bold;">{{$store.state.user.username}}</h4>
-                <p class="card-text" style="margin: 0; font-weight: bold;">Ranking:</p>
+                <p class="card-text" style="margin: 0; font-weight: bold;">Ranking: {{ $store.state.user.ranking }}</p>
                 <p class="card-text" style="font-weight: bold;">Snake: <span v-if="$store.state.user.id == $store.state.pk.a_id" style="color: #4876EC;">blue</span> <span v-else-if="$store.state.user.id == $store.state.pk.b_id" style="color: #F94848;">red</span></p>
               </div>
             </div>
@@ -32,7 +32,7 @@
             <div class="col-md-8">
               <div class="card-body" style="background-color: #E5E5FF;">
                 <h4 class="card-title" style="font-weight: bold;">{{$store.state.pk.opponent_username}}</h4>
-                <p class="card-text" style="margin: 0; font-weight: bold;">Ranking: </p>
+                <p class="card-text" style="margin: 0; font-weight: bold;">Ranking: {{ $store.state.pk.opponent_ranking }}</p>
                 <p class="card-text" style="font-weight: bold;">Snake: <span v-if="$store.state.user.id == $store.state.pk.a_id" style="color: #F94848;">red</span> <span v-else-if="$store.state.user.id == $store.state.pk.b_id" style="color: #4876EC;">blue</span></p>
               </div>
             </div>
@@ -50,9 +50,8 @@ import { useStore } from "vuex";
 export default{
   setup() {
     const store = useStore();
-    return{
-      store,
-    }
+    console.log("My ranking is: " + store.state.user.ranking);
+    console.log("The opponent player ranking is: " + store.state.user.opponent_ranking);
   }
 }
 </script>
