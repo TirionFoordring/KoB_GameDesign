@@ -50,9 +50,22 @@ import { useStore } from "vuex";
 export default{
   setup() {
     const store = useStore();
+    // 更新opponent_ranking的方法是HomeIndex.vue文件中的socket.onmessage函数
+    // 获取方式的实现在后端的consumer.WebSocketServer.java文件中的startGame函数下
     console.log("My ranking is: " + store.state.user.ranking);
     console.log("The opponent player ranking is: " + store.state.user.opponent_ranking);
-  }
+  },
+  mounted() {
+    // 每局游戏开始时更新当前用户的等级分，防止再连续游戏时，下方的信息卡片出现己方等级分未更新的问题
+    this.$store.dispatch("getinfo", {
+      success: (resp) => {
+        console.log("User info updated:", resp);
+      },
+      error: (error) => {
+        console.error("Failed to update user info:", error);
+      },
+    });
+  },
 }
 </script>
 
