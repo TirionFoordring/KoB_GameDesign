@@ -1,74 +1,27 @@
 import { Base_Object } from "./BaseObject.js";
+import { snake } from "./Snake.js";
 import { Wall } from "./Wall.js";
 
 export class Game_Map extends Base_Object {
-    constructor(ctx, parent) { //ctx为画布，parent为画布的父元素
+    constructor(ctx, parent, store) { //ctx为画布，parent为画布的父元素
         super();
         this.ctx = ctx;
         this.parent = parent;
         this.L = 0; //L为单位长度
+        this.store = store;
         this.rows = 13;
-        this.cols = 13;
+        this.cols = 14;
         this.walls = [];
-        this.inner_walls_number = 24;
+        this.inner_walls_number = 20;
+
+        this.snakes = [
+            new snake({ id: 0, color: "#4876EC", r: this.rows - 2, c: 1 }, this),
+            new snake({ id: 1, color: "#F94848", r: 1, c: this.cols - 2 }, this)
+        ]
     }
 
-    //Ensure that the bottom left and top right corners of the map are connected
-    //source:(sx, sy); target:(tx, ty)
-    connectivity(g, sx, sy, tx, ty) {
-        if (sx === tx && sy === ty) return true;
-
-        return true;
-    }
-
-    Creat_Wall() {
-        let g = [];
-        for (let r = 0; r < this.rows; r++) {
-            g[r] = [];
-            for (let c = 0; c < this.cols; c++) {
-                g[r][c] = false;
-            }
-        }
-
-        //add walls around the map
-        for (let r = 0; r < this.rows; r++) {
-            for (let c = 0; c < this.cols; c++) {
-                if (r === 0 || c === 0 || r === this.rows - 1 || c === this.cols - 1) {
-                    g[r][c] = true;
-                }
-            }
-        }
-
-        //create inner walls randomly
-        for (let i = 0; i < this.inner_walls_number / 2; i++) {
-            for (let j = 0; j < 1000; j++) {
-                let r = parseInt(Math.random(0, 1) * this.rows);
-                let c = parseInt(Math.random(0, 1) * this.cols);
-
-                //如果此处已经是墙壁了，再次搜索
-                if (g[r][c])
-                    continue;
-
-                //左下角和右上角禁止生成墙壁
-                if ((r === this.rows - 2 && c === 1) || (r === 1 && c === this.cols - 2))
-                    continue;
-
-                //add the wall symmetrically
-                g[r][c] = true;
-                g[c][r] = true;
-                break;
-
-            }
-        }
-
-        //copy the current map and deliver it to the function "connectivity" in order to check the connectivity of this map.
-        //把g转换为JSON文件再解析，确保复制的同时不会影响原本的文件
-        const copy_g = JSON.parse(JSON.stringify(g));
-
-
-        //check whether the the bottom left and top right corners of the map are connected
-        if (!this.connectivity(copy_g, 1, this.rows - 2, this.cols - 2, 1)) return false;
-
+    Create_Wall() {
+        const g = this.store.state.pk.gamemap;
 
         //draw all walls
         for (let r = 0; r < this.rows; r++) {
@@ -78,15 +31,59 @@ export class Game_Map extends Base_Object {
                 }
             }
         }
+    }
 
-        return true;
+    //获取用户输入
+    add_listening_events() {
+        if (this.store.state.record.is_record) {
+            let k = 0;
+            console.log(this.store.state.record);
+            const loser = this.store.state.record.record_loser;
+            const a_steps = this.store.state.record.a_steps;
+            const b_steps = this.store.state.record.b_steps;
+            const [snake0, snake1] = this.snakes;
+            // setInterval用于设置每x毫秒执行一遍某函数
+            const interval_id = setInterval(() => {
+                if (k >= a_steps.length - 1) {
+                    if (loser === "all") {
+                        snake0.status = "die";
+                        snake1.status = "die";
+                    } else if (loser === "A") {
+                        snake0.status = "die";
+                    } else if (loser === "B") {
+                        snake1.status = "die";
+                    }
+                    clearInterval(interval_id);
+                } else {
+                    snake0.set_direction(parseInt(a_steps[k]));
+                    snake1.set_direction(parseInt(b_steps[k]));
+                }
+                k++;
+            }, 500); // 每500ms执行一次
+        } else {
+            this.ctx.canvas.focus();
+            this.ctx.canvas.addEventListener("keydown", e => {
+                let d = -1;
+                if (e.key === "w") d = 0;
+                else if (e.key === "d") d = 1;
+                else if (e.key === "s") d = 2;
+                else if (e.key === "a") d = 3;
+
+                //若进行了合法的移动操作，则向后端传入消息
+                if (d >= 0) {
+                    this.store.state.pk.socket.send(JSON.stringify({
+                        event: "move",
+                        direction: d,
+                    }));
+                }
+            })
+
+        }
     }
 
     start() {
-        while (!this.Creat_Wall()) {
-            this.Creat_Wall();
-        }
-
+        this.Create_Wall();
+        this.add_listening_events();
     }
 
     update_size() {
@@ -97,8 +94,47 @@ export class Game_Map extends Base_Object {
         this.ctx.canvas.height = this.L * this.rows;
     }
 
+    //check are the two snakes are ready.
+    check_ready() {
+        for (const snake of this.snakes) {
+            if (snake.status !== "idle") return false;
+            if (snake.direction === -1) return false;
+        }
+        return true;
+    }
+
+    next_step() {
+        for (const snake of this.snakes) {
+            snake.next_step();
+        }
+    }
+
+    //检测下一步不能碰撞墙或者身体
+    check_valid(cell) {
+
+        for (const wall of this.walls) {
+            if (wall.r === cell.r && wall.c === cell.c)
+                return false;
+        }
+
+        for (const snake of this.snakes) {
+            let k = snake.cells.length;
+            if (!snake.check_tail_increasing()) k--; //当蛇尾下一步会前进的时候，下一格是可以走的
+            for (let i = 0; i < k; i++) {
+                if (snake.cells[i].r === cell.r && snake.cells[i].c === cell.c)
+                    return false;
+            }
+        }
+
+        return true;
+
+    }
+
     update() {
         this.update_size();
+        if (this.check_ready()) {
+            this.next_step();
+        }
         this.render();
     }
 
