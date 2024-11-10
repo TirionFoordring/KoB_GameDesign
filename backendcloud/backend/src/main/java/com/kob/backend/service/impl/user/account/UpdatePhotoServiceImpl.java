@@ -1,5 +1,6 @@
 package com.kob.backend.service.impl.user.account;
 
+import com.kob.backend.consumer.WebSocketServer;
 import com.kob.backend.mapper.UserMapper;
 import com.kob.backend.pojo.User;
 import com.kob.backend.service.impl.utils.UserDetailsImpl;
@@ -23,7 +24,6 @@ public class UpdatePhotoServiceImpl implements UpdatePhotoService {
 
     @Override
     public Map<String, String> updatephoto(Map<String, String> data) {
-        System.out.println("这段代码被运行了");
 
         UsernamePasswordAuthenticationToken authenticationToken = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         UserDetailsImpl loginUser = (UserDetailsImpl) authenticationToken.getPrincipal();
@@ -34,8 +34,7 @@ public class UpdatePhotoServiceImpl implements UpdatePhotoService {
         Map<String, String> map = new HashMap<>();
 
         if (profilePhoto == null || profilePhoto.isEmpty()) {
-            System.out.println("这个条件被触发了");
-            map.put("error_message", "The profile photo cannot be empty");
+            map.put("error_message", "The profile photo cannot be empty.");
             return map;
         }
 
@@ -51,14 +50,13 @@ public class UpdatePhotoServiceImpl implements UpdatePhotoService {
             System.out.println("图片大小符合要求，继续处理");
 
             // 更新用户头像
-            userMapper.selectById(user.getId()).setPhoto(profilePhoto);
+//            user.setPhoto(profilePhoto);
+            userMapper.updateById(user);
             map.put("error_message", "SUCCESS! Profile photo has been updated.");
-            map.put("profilePhoto", profilePhoto);
-            System.out.println("返回了success信息");
+            map.put("profilePhoto", userMapper.selectById(user.getId()).getPhoto());
 
         } catch (Exception e) {
-            // 捕获异常并返回错误信息
-            System.out.println("处理过程中出现了异常: " + e.getMessage());
+            System.out.println(e.getMessage());
             map.put("error_message", "An error occurred while processing the image.");
         }
 

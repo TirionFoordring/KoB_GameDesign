@@ -6,7 +6,7 @@
         <div class="card" style="margin: 20px 20px 10px;">
           <div class="card-body" style="text-align: center;">
             <img :src="$store.state.user.photo" alt="" style="width: 100%;">
-            <button type="button" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#updatePhotoModal">Update Profile Photo</button>
+            <button type="button" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#updatePhotoModal" style="margin-top: 10px;">Update Profile Photo</button>
           </div>
         </div>
 
@@ -315,7 +315,6 @@ export default{
 
     // 上传头像相关代码
     const imageUploadError = ref("");
-
     // 预览头像
     const previewImage = (event) => {
       const file = event.target.files[0];
@@ -351,14 +350,12 @@ export default{
       
       reader.onload = function(e) {
         const base64Image = e.target.result; // 获取Base64字符串
-        console.log(base64Image); // 打印base64，检查是否正确
-
         const formData = new FormData();
         formData.append("profilePhoto", base64Image); // 将base64字符串添加到FormData中
 
         // 发送到后端
         $.ajax({
-          url: "http://localhost:3000/user/bot/updatephoto/", // 后端接口
+          url: "http://localhost:3000/user/bot/updatephoto/",
           type: "POST",
           headers: {
             Authorization: "Bearer " + store.state.user.token,
@@ -370,9 +367,7 @@ export default{
             if (resp.error_message === "SUCCESS! Profile photo has been updated.") {
               // 更新用户头像URL
               store.state.user.photo = resp.profilePhoto;
-
-              Modal.getInstance("#updatePhotoModal").hide();
-              imageUploadError.value = resp.error_message;
+              imageUploadError.value = "Profile photo has been updated.";
             } else {
               imageUploadError.value = resp.error_message;
             }
@@ -393,7 +388,8 @@ export default{
       remove_bot,
       update_bot,
       previewImage,
-      update_photo
+      update_photo,
+      imageUploadError
     }
   }
 }
