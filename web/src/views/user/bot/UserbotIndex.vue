@@ -4,10 +4,45 @@
 
       <div class="col-3">
         <div class="card" style="margin: 20px 20px 10px;">
-          <div class="card-body">
+          <div class="card-body" style="text-align: center;">
             <img :src="$store.state.user.photo" alt="" style="width: 100%;">
+            <button type="button" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#updatePhotoModal">Update Profile Photo</button>
           </div>
         </div>
+
+        <!-- 上传头像的模态框 -->
+        <div class="modal fade" id="updatePhotoModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h1 class="modal-title fs-5" id="staticBackdropLabel" style="font-weight: bold;">Update Profile Photo</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+
+              <!-- 头像上传区域 -->
+              <div class="modal-body">
+                <form id="avatarForm">
+                  <div class="form-group">
+                    <label for="avatarInput">Choose a Local Image: </label>
+                    <input type="file" class="form-control-file" id="avatarInput" accept="image/*" @change="previewImage" required>
+                  </div>
+                </form>
+                <br>
+                <h6>Image Preview:</h6>
+                <div id="previewContainer" style="display:none;">
+                  <img id="preview" src="" alt="Avatar Preview" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                </div>
+              </div>
+
+              <div class="modal-footer">
+                <!-- <div class="error_message">{{ imageUploadError }}</div> -->
+                <button type="button" class="btn btn-outline-primary" @click="update_photo">Save and UpLoad</button>
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
 
         <!-- 显示个人信息 -->
         <div class="card" style="margin: 10px 20px; ">
@@ -32,7 +67,7 @@
             <button type="button" class="btn btn-dark float-end" data-bs-toggle="modal" data-bs-target="#addBotModal">Create a new bot</button>
 
             <!-- Modal for create a new bot -->
-            <div class="modal fade" id="addBotModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal fade" id="addBotModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
               <div class="modal-dialog modal-xl">
                 <div class="modal-content">
                   <div class="modal-header">
@@ -67,7 +102,7 @@
                     </form>
                   </div>
                   <div class="modal-footer">
-                    <div id="error_message">{{ botadd.error_message }}</div>
+                    <div class="error_message">{{ botadd.error_message }}</div>
                     <button type="button" class="btn btn-outline-primary" @click="add_bot">Save and UpLoad</button>
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
                   </div>
@@ -278,12 +313,36 @@ export default{
       });
     };
 
+    // 上传头像相关代码
+    // const imageUploadError = ref("");
+
+    // 预览头像
+    const previewImage = (event) => {
+    const file = event.target.files[0];
+    const previewContainer = document.getElementById('previewContainer');
+    const previewImage = document.getElementById('preview');
+
+    if (file) {
+      const reader = new FileReader();
+
+      reader.onload = function (e) {
+        previewImage.src = e.target.result;
+        previewContainer.style.display = 'block'; // 显示预览容器
+      };
+
+      reader.readAsDataURL(file);
+    } else {
+      previewContainer.style.display = 'none'; // 如果没有选择文件，隐藏预览容器
+    }
+  };
+
     return {
       bots,
       botadd,
       add_bot,
       remove_bot,
       update_bot,
+      previewImage
     }
   }
 }
@@ -309,7 +368,7 @@ button#deleteButton {
   vertical-align: middle;
 }
 
-div#error_message{
+div.error_message{
   color: red;
 }
 
