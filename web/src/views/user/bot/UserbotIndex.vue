@@ -18,25 +18,25 @@
                 <h1 class="modal-title fs-5" id="staticBackdropLabel" style="font-weight: bold;">Update Profile Photo</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
-
               <!-- 头像上传区域 -->
               <div class="modal-body">
+                <!-- 选择图片 -->
                 <form id="avatarForm">
                   <div class="form-group">
-                    <label for="avatarInput">Choose a Local Image: </label>
-                    <input type="file" class="form-control-file" id="avatarInput" accept="image/*" @change="previewImage" required>
+                    <label for="imageInput">Choose a Local Image: </label>
+                    <input type="file" class="form-control-file" id="imageInput" accept="image/*" @change="previewImage" required>
                   </div>
                 </form>
                 <br>
+                <!-- 图片预览 -->
                 <h6>Image Preview:</h6>
                 <div id="previewContainer" style="display:none;">
                   <img id="preview" src="" alt="Avatar Preview" style="max-width: 100%; max-height: 100%; object-fit: contain;">
                 </div>
               </div>
-
               <div class="modal-footer">
-                <!-- <div class="error_message">{{ imageUploadError }}</div> -->
-                <button type="button" class="btn btn-outline-primary" @click="update_photo">Save and UpLoad</button>
+                <div class="error_message">{{ imageUploadError }}</div>
+                <button type="button" class="btn btn-outline-primary" @click="update_photo">UpLoad</button>
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
               </div>
             </div>
@@ -314,27 +314,77 @@ export default{
     };
 
     // 上传头像相关代码
-    // const imageUploadError = ref("");
+    const imageUploadError = ref("");
 
     // 预览头像
     const previewImage = (event) => {
-    const file = event.target.files[0];
-    const previewContainer = document.getElementById('previewContainer');
-    const previewImage = document.getElementById('preview');
+      const file = event.target.files[0];
+      const previewContainer = document.getElementById('previewContainer');
+      const previewImage = document.getElementById('preview');
 
-    if (file) {
+      if (file) {
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+          previewImage.src = e.target.result;
+          previewContainer.style.display = 'block'; // 显示预览容器
+        };
+
+        reader.readAsDataURL(file);
+      } else {
+        previewContainer.style.display = 'none'; // 如果没有选择文件，隐藏预览容器
+      }
+    };
+
+    // 发送头像到后端
+    const update_photo = () => {
+      const fileInput = document.getElementById("imageInput");
+      const file = fileInput.files[0];
+
+      if (!file) {
+        imageUploadError.value = "Please select an image.";
+        return;
+      }
+
+      // 使用FileReader将图片转换为Base64字符串
       const reader = new FileReader();
+      
+      reader.onload = function(e) {
+        const base64Image = e.target.result; // 获取Base64字符串
+        console.log(base64Image); // 打印base64，检查是否正确
 
-      reader.onload = function (e) {
-        previewImage.src = e.target.result;
-        previewContainer.style.display = 'block'; // 显示预览容器
+        const formData = new FormData();
+        formData.append("profilePhoto", base64Image); // 将base64字符串添加到FormData中
+
+        // 发送到后端
+        $.ajax({
+          url: "http://localhost:3000/user/bot/updatephoto/", // 后端接口
+          type: "POST",
+          headers: {
+            Authorization: "Bearer " + store.state.user.token,
+          },
+          data: formData, // 使用FormData对象发送数据
+          processData: false, // 防止jQuery自动处理数据
+          contentType: false, // 防止jQuery自动设置Content-Type
+          success(resp) {
+            if (resp.error_message === "SUCCESS! Profile photo has been updated.") {
+              // 更新用户头像URL
+              store.state.user.photo = resp.profilePhoto;
+
+              Modal.getInstance("#updatePhotoModal").hide();
+              imageUploadError.value = resp.error_message;
+            } else {
+              imageUploadError.value = resp.error_message;
+            }
+          },
+          error() {
+            imageUploadError.value = "An error occurred while uploading the image.";
+          }
+        });
       };
 
-      reader.readAsDataURL(file);
-    } else {
-      previewContainer.style.display = 'none'; // 如果没有选择文件，隐藏预览容器
-    }
-  };
+      reader.readAsDataURL(file);  // 将文件读取为Base64字符串
+    };
 
     return {
       bots,
@@ -342,7 +392,8 @@ export default{
       add_bot,
       remove_bot,
       update_bot,
-      previewImage
+      previewImage,
+      update_photo
     }
   }
 }
