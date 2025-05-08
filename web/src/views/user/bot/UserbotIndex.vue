@@ -25,6 +25,7 @@
 
               <!-- 图片选择区域 -->
               <div class="container text-center">
+                <!-- 第1行图片 -->
                 <div class="row">
                   <div class="col-4">
                     <img 
@@ -48,6 +49,46 @@
                       alt="examplePhotselectedImageo3" 
                       :class="selectedImage == 3 ? 'selected-image' : 'selectable-image'"
                       @click="selectImage(3)"
+                    >
+                  </div>
+                </div>
+
+                <!-- 第2行图片 -->
+                <div class="row">
+                  <div class="col-4">
+                    <img 
+                      src="https://lh3.googleusercontent.com/Qifv3yehXafCJkJ28bHB4UrmGy-U6Vy_EG9HYmPLv-ad-hrGHnFGx5djS_5PKkiig0vVcRQvu2M2SoAljLM7fXK5G3o=s137" 
+                      alt="examplePhoto1" 
+                      :class="selectedImage == 4 ? 'selected-image' : 'selectable-image'"
+                      @click="selectImage(4)"
+                    >
+                  </div>
+                  <div class="col-4">
+                    <img 
+                      src="https://lh3.googleusercontent.com/6XG4XRahS3ODxEMUDit1-Nit2C8vw48Xbbext7KNOr0SEkL-ng4yOQhYxOmg9PqjukQ3VSq5zJcLx7YWffmf_r28lw=s137" 
+                      alt="examplePhoto2" 
+                      :class="selectedImage == 5 ? 'selected-image' : 'selectable-image'"
+                      @click="selectImage(5)"
+                    >
+                  </div>
+                  <div class="col-4">
+                    <img 
+                      src="https://lh3.googleusercontent.com/IX8GJbAVsWdPXjV_FXPIpci81jsyqEML8iSzPoeksmlP5mDQhzr1FFdgsv_bsRGggUJYfdIK1Zx7SM7fW-z05BaLDg=s137" 
+                      alt="examplePhotselectedImageo3" 
+                      :class="selectedImage == 6 ? 'selected-image' : 'selectable-image'"
+                      @click="selectImage(6)"
+                    >
+                  </div>
+                </div>
+
+                <!-- 第3行图片 -->
+                <div class="row">
+                  <div class="col-4">
+                    <img 
+                      src="https://lh3.googleusercontent.com/5WOnn9PwMwlrBRZvSvzexoGC5gTGaKTP_NlTcNLRwKXgitb3Hb--W07inTNwM1HsY1bNpkTfcaqCK_93ausVyC8N=s137" 
+                      alt="examplePhoto1" 
+                      :class="selectedImage == 7 ? 'selected-image' : 'selectable-image'"
+                      @click="selectImage(7)"
                     >
                   </div>
                 </div>
@@ -383,7 +424,11 @@ export default{
       const urls = {
         1: "https://lh3.googleusercontent.com/24gpmSadEamr-vJRyQNEqjUWBuWmmplfmoNCzoipN8dfS-_9ul9jPn-Htz8vQONJpitB8TyVompK8VlGeN9lR6xDzyo=s137",
         2: "https://lh3.googleusercontent.com/I_d143LyUop7Jch28lnBNGSv1FsSgtAaTkHH2-9O8hG9ZjfuHshjW8px5UXeW5FqUtW2zhPjq4-KAvvzfAJgN50JJg=s137",
-        3: "https://lh3.googleusercontent.com/XLnG6jiRDzz_jgeyzzb4TAE4KYGOfNkZeBa5-Ci-9tEhsI9B_flP86eXe4Ix70kATjsQasCJZhb1MWu5fDn3qAgMsw=s137"
+        3: "https://lh3.googleusercontent.com/XLnG6jiRDzz_jgeyzzb4TAE4KYGOfNkZeBa5-Ci-9tEhsI9B_flP86eXe4Ix70kATjsQasCJZhb1MWu5fDn3qAgMsw=s137",
+        4: "https://lh3.googleusercontent.com/Qifv3yehXafCJkJ28bHB4UrmGy-U6Vy_EG9HYmPLv-ad-hrGHnFGx5djS_5PKkiig0vVcRQvu2M2SoAljLM7fXK5G3o=s137",
+        5: "https://lh3.googleusercontent.com/6XG4XRahS3ODxEMUDit1-Nit2C8vw48Xbbext7KNOr0SEkL-ng4yOQhYxOmg9PqjukQ3VSq5zJcLx7YWffmf_r28lw=s137",
+        6: "https://lh3.googleusercontent.com/IX8GJbAVsWdPXjV_FXPIpci81jsyqEML8iSzPoeksmlP5mDQhzr1FFdgsv_bsRGggUJYfdIK1Zx7SM7fW-z05BaLDg=s137",
+        7: "https://lh3.googleusercontent.com/5WOnn9PwMwlrBRZvSvzexoGC5gTGaKTP_NlTcNLRwKXgitb3Hb--W07inTNwM1HsY1bNpkTfcaqCK_93ausVyC8N=s137"
       };
       return urls[id];
     };

@@ -28,8 +28,8 @@ public class UpdatePhotoServiceImpl implements UpdatePhotoService {
         String idStr = data.get("selected_image_id");
         Map<String, String> map = new HashMap<>();
 
-        if (idStr == null || !idStr.matches("[1-3]")) {
-            map.put("error_message", "Invalid image id. Only 1, 2, or 3 allowed.");
+        if (idStr == null || !idStr.matches("[1-7]")) {
+            map.put("error_message", "Invalid image id. Only 1-6 allowed.");
             return map;
         }
 
@@ -52,6 +52,14 @@ public class UpdatePhotoServiceImpl implements UpdatePhotoService {
                 return "https://lh3.googleusercontent.com/I_d143LyUop7Jch28lnBNGSv1FsSgtAaTkHH2-9O8hG9ZjfuHshjW8px5UXeW5FqUtW2zhPjq4-KAvvzfAJgN50JJg=s137";
             case 3:
                 return "https://lh3.googleusercontent.com/XLnG6jiRDzz_jgeyzzb4TAE4KYGOfNkZeBa5-Ci-9tEhsI9B_flP86eXe4Ix70kATjsQasCJZhb1MWu5fDn3qAgMsw=s137";
+            case 4:
+                return "https://lh3.googleusercontent.com/Qifv3yehXafCJkJ28bHB4UrmGy-U6Vy_EG9HYmPLv-ad-hrGHnFGx5djS_5PKkiig0vVcRQvu2M2SoAljLM7fXK5G3o=s137";
+            case 5:
+                return "https://lh3.googleusercontent.com/6XG4XRahS3ODxEMUDit1-Nit2C8vw48Xbbext7KNOr0SEkL-ng4yOQhYxOmg9PqjukQ3VSq5zJcLx7YWffmf_r28lw=s137";
+            case 6:
+                return "https://lh3.googleusercontent.com/IX8GJbAVsWdPXjV_FXPIpci81jsyqEML8iSzPoeksmlP5mDQhzr1FFdgsv_bsRGggUJYfdIK1Zx7SM7fW-z05BaLDg=s137";
+            case 7:
+                return "https://lh3.googleusercontent.com/5WOnn9PwMwlrBRZvSvzexoGC5gTGaKTP_NlTcNLRwKXgitb3Hb--W07inTNwM1HsY1bNpkTfcaqCK_93ausVyC8N=s137";
             default:
                 throw new IllegalArgumentException("Invalid image ID");
         }
