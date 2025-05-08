@@ -18,52 +18,43 @@ public class UpdatePhotoServiceImpl implements UpdatePhotoService {
     @Autowired
     private UserMapper userMapper;
 
-    // 设置最大允许的图片大小 = 5MB
-    private static final long MAX_IMAGE_SIZE = 5 * 1024 * 1024;
-
     @Override
     public Map<String, String> updatephoto(Map<String, String> data) {
-
-        UsernamePasswordAuthenticationToken authenticationToken = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        UsernamePasswordAuthenticationToken authenticationToken =
+                (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         UserDetailsImpl loginUser = (UserDetailsImpl) authenticationToken.getPrincipal();
         User user = loginUser.getUser();
 
-        String profilePhoto = data.get("profilePhoto");
-
+        String idStr = data.get("selected_image_id");
         Map<String, String> map = new HashMap<>();
 
-        if (profilePhoto == null || profilePhoto.isEmpty()) {
-            map.put("error_message", "The profile photo cannot be empty.");
+        if (idStr == null || !idStr.matches("[1-3]")) {
+            map.put("error_message", "Invalid image id. Only 1, 2, or 3 allowed.");
             return map;
         }
 
-        try {
-            // 校验图片大小
-            long imageSize = getBase64ImageSize(profilePhoto);
-            if (imageSize > MAX_IMAGE_SIZE) {
-                map.put("error_message", "The image file is too large. Maximum allowed size is 5MB.");
-                return map;
-            }
+        int id = Integer.parseInt(idStr);
+        String photoUrl = getPhotoUrlById(id);
 
-            // 更新用户头像
-//            user.setPhoto(profilePhoto);
-            userMapper.updateById(user);
-            map.put("error_message", "SUCCESS! Profile photo has been updated.");
-//            map.put("profilePhoto", userMapper.selectById(user.getId()).getPhoto());
-            map.put("profilePhoto", profilePhoto);
+        user.setPhoto(photoUrl);
+        userMapper.updateById(user);
 
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            map.put("error_message", "An error occurred while processing the image.");
-        }
-
+        map.put("error_message", "SUCCESS! Profile photo has been updated.");
+        map.put("profilePhoto", photoUrl);
         return map;
     }
 
-    // 估算图片大小
-    private long getBase64ImageSize(String base64Image) {
-        // Base64编码的字符串是以"data:image/..."开头的，可以去除掉前缀部分来计算实际的字节数
-        String base64Data = base64Image.split(",")[1]; // 获取图片的Base64数据部分
-        return base64Data.length() * 3 / 4;
+    private String getPhotoUrlById(int id) {
+        switch (id) {
+            case 1:
+                return "https://lh3.googleusercontent.com/24gpmSadEamr-vJRyQNEqjUWBuWmmplfmoNCzoipN8dfS-_9ul9jPn-Htz8vQONJpitB8TyVompK8VlGeN9lR6xDzyo=s137";
+            case 2:
+                return "https://lh3.googleusercontent.com/I_d143LyUop7Jch28lnBNGSv1FsSgtAaTkHH2-9O8hG9ZjfuHshjW8px5UXeW5FqUtW2zhPjq4-KAvvzfAJgN50JJg=s137";
+            case 3:
+                return "https://lh3.googleusercontent.com/XLnG6jiRDzz_jgeyzzb4TAE4KYGOfNkZeBa5-Ci-9tEhsI9B_flP86eXe4Ix70kATjsQasCJZhb1MWu5fDn3qAgMsw=s137";
+            default:
+                throw new IllegalArgumentException("Invalid image ID");
+        }
     }
 }
+

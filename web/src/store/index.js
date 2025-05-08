@@ -9,6 +9,9 @@ export default createStore({
   getters: {
   },
   mutations: {
+    updatePhoto(state, newPhotoUrl) {
+      state.user.photo = newPhotoUrl;
+    },
   },
   actions: {
   },

@@ -6,34 +6,56 @@
         <div class="card" style="margin: 20px 20px 10px;">
           <div class="card-body" style="text-align: center;">
             <img :src="$store.state.user.photo" alt="" style="width: 100%;">
-            <button type="button" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#updatePhotoModal" style="margin-top: 10px;">Update Profile Photo</button>
+            <button type="button" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#changePhotoModal" style="margin-top: 10px;" @click="resetchangePhotoModal">Change Profile Photo</button>
           </div>
         </div>
 
         <!-- 上传头像的模态框 -->
-        <div class="modal fade" id="updatePhotoModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal fade" id="changePhotoModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
           <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
+
+              <!-- 模态框头部 -->
               <div class="modal-header">
-                <h1 class="modal-title fs-5" id="staticBackdropLabel" style="font-weight: bold;">Update Profile Photo</h1>
+                <h1 class="modal-title fs-5" id="staticBackdropLabel" style="font-weight: bold;">Change Profile Photo</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
-              <!-- 头像上传区域 -->
-              <div class="modal-body">
-                <!-- 选择图片 -->
-                <form id="avatarForm">
-                  <div class="form-group">
-                    <label for="imageInput">Choose a Local Image: </label>
-                    <input type="file" class="form-control-file" id="imageInput" accept="image/*" @change="previewImage" required>
+
+              <br>
+
+              <!-- 图片选择区域 -->
+              <div class="container text-center">
+                <div class="row">
+                  <div class="col-4">
+                    <img 
+                      src="https://lh3.googleusercontent.com/24gpmSadEamr-vJRyQNEqjUWBuWmmplfmoNCzoipN8dfS-_9ul9jPn-Htz8vQONJpitB8TyVompK8VlGeN9lR6xDzyo=s137" 
+                      alt="examplePhoto1" 
+                      :class="selectedImage == 1 ? 'selected-image' : 'selectable-image'"
+                      @click="selectImage(1)"
+                    >
                   </div>
-                </form>
-                <br>
-                <!-- 图片预览 -->
-                <h6>Image Preview:</h6>
-                <div id="previewContainer" style="display:none;">
-                  <img id="preview" src="" alt="Avatar Preview" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                  <div class="col-4">
+                    <img 
+                      src="https://lh3.googleusercontent.com/I_d143LyUop7Jch28lnBNGSv1FsSgtAaTkHH2-9O8hG9ZjfuHshjW8px5UXeW5FqUtW2zhPjq4-KAvvzfAJgN50JJg=s137" 
+                      alt="examplePhoto2" 
+                      :class="selectedImage == 2 ? 'selected-image' : 'selectable-image'"
+                      @click="selectImage(2)"
+                    >
+                  </div>
+                  <div class="col-4">
+                    <img 
+                      src="https://lh3.googleusercontent.com/XLnG6jiRDzz_jgeyzzb4TAE4KYGOfNkZeBa5-Ci-9tEhsI9B_flP86eXe4Ix70kATjsQasCJZhb1MWu5fDn3qAgMsw=s137" 
+                      alt="examplePhotselectedImageo3" 
+                      :class="selectedImage == 3 ? 'selected-image' : 'selectable-image'"
+                      @click="selectImage(3)"
+                    >
+                  </div>
                 </div>
               </div>
+
+              <br>
+
+              <!-- 模态框底部按钮 -->
               <div class="modal-footer">
                 <div class="error_message">{{ imageUploadError }}</div>
                 <button type="button" class="btn btn-outline-primary" @click="update_photo">UpLoad</button>
@@ -314,72 +336,58 @@ export default{
     };
 
     // 上传头像相关代码
-    const imageUploadError = ref("");
-    // 预览头像
-    const previewImage = (event) => {
-      const file = event.target.files[0];
-      const previewContainer = document.getElementById('previewContainer');
-      const previewImage = document.getElementById('preview');
+    const selectedImage = ref(null);
+    const imageUploadError = ref(null);
+    const resetchangePhotoModal = () => {
+      imageUploadError.value = "";
+    }
 
-      if (file) {
-        const reader = new FileReader();
-
-        reader.onload = function (e) {
-          previewImage.src = e.target.result;
-          previewContainer.style.display = 'block'; // 显示预览容器
-        };
-
-        reader.readAsDataURL(file);
-      } else {
-        previewContainer.style.display = 'none'; // 如果没有选择文件，隐藏预览容器
-      }
+    const selectImage = (imageNumber) => {
+      selectedImage.value = imageNumber;
     };
 
-    // 发送头像到后端
     const update_photo = () => {
-      const fileInput = document.getElementById("imageInput");
-      const file = fileInput.files[0];
-
-      if (!file) {
-        imageUploadError.value = "Please select an image.";
+      const imageId = selectedImage.value;
+      if (imageId === null) {
+        imageUploadError.value = "Please select a photo.";
         return;
       }
 
-      // 使用FileReader将图片转换为Base64字符串
-      const reader = new FileReader();
-      
-      reader.onload = function(e) {
-        const base64Image = e.target.result; // 获取Base64字符串
-        const formData = new FormData();
-        formData.append("profilePhoto", base64Image); // 将base64字符串添加到FormData中
-
-        // 发送到后端
-        $.ajax({
-          url: "http://localhost:3000/user/bot/updatephoto/",
-          type: "POST",
-          headers: {
-            Authorization: "Bearer " + store.state.user.token,
-          },
-          data: formData, // 使用FormData对象发送数据
-          processData: false, // 防止jQuery自动处理数据
-          contentType: false, // 防止jQuery自动设置Content-Type
-          success(resp) {
-            if (resp.error_message === "SUCCESS! Profile photo has been updated.") {
-              // 更新用户头像URL
-              store.state.user.photo = resp.profilePhoto;
-              imageUploadError.value = "Profile photo has been updated.";
-            } else {
-              imageUploadError.value = resp.error_message;
-            }
-          },
-          error() {
-            imageUploadError.value = "An error occurred while uploading the image.";
+      $.ajax({
+        url: "http://localhost:3000/user/bot/updatephoto/",
+        type: "post",
+        headers: {
+          Authorization: "Bearer " + store.state.user.token,
+        },
+        data: {
+          selected_image_id: imageId,
+        },
+        success(resp) {
+          if (resp.error_message === "SUCCESS! Profile photo has been updated.") {
+            // 构造新头像 URL（你可以根据实际规则调整）
+            const newPhotoUrl = getPhotoUrlById(imageId);
+            store.commit("updatePhoto", newPhotoUrl); // 更新 Vuex
+            imageUploadError.value = "Profile photo has been updated.";
+            Modal.getInstance("#changePhotoModal").hide(); // 自动关闭模态框
+          } else {
+            imageUploadError.value = resp.error_message;
           }
-        });
-      };
-
-      reader.readAsDataURL(file);  // 将文件读取为Base64字符串
+        },
+        error() {
+          imageUploadError.value = "An error occurred while updating the image.";
+        }
+      });
     };
+
+    const getPhotoUrlById = (id) => {
+      const urls = {
+        1: "https://lh3.googleusercontent.com/24gpmSadEamr-vJRyQNEqjUWBuWmmplfmoNCzoipN8dfS-_9ul9jPn-Htz8vQONJpitB8TyVompK8VlGeN9lR6xDzyo=s137",
+        2: "https://lh3.googleusercontent.com/I_d143LyUop7Jch28lnBNGSv1FsSgtAaTkHH2-9O8hG9ZjfuHshjW8px5UXeW5FqUtW2zhPjq4-KAvvzfAJgN50JJg=s137",
+        3: "https://lh3.googleusercontent.com/XLnG6jiRDzz_jgeyzzb4TAE4KYGOfNkZeBa5-Ci-9tEhsI9B_flP86eXe4Ix70kATjsQasCJZhb1MWu5fDn3qAgMsw=s137"
+      };
+      return urls[id];
+    };
+
 
     return {
       bots,
@@ -387,9 +395,11 @@ export default{
       add_bot,
       remove_bot,
       update_bot,
-      previewImage,
       update_photo,
-      imageUploadError
+      selectImage,
+      selectedImage,
+      imageUploadError,
+      resetchangePhotoModal
     }
   }
 }
@@ -423,4 +433,23 @@ div.UserInfo {
   font-size: 110%;
   line-height: 180%;
 }
+
+/* 选择图片的样式 */
+.selectable-image,
+.selected-image {
+  border: 3px solid transparent; /* 默认就预留空间 */
+  border-radius: 5px;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+}
+
+.selectable-image:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.selected-image {
+  border-color: #000;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
 </style>
