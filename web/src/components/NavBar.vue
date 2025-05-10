@@ -27,7 +27,7 @@
             <li><hr class="drowdown-divider"></li>
             <li><a class="dropdown-item" href="#" @click="logout">log out</a></li>
           </ul>
-        </li>
+      </li>
     </div>
     
 
